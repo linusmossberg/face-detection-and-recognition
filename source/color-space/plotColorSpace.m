@@ -1,10 +1,13 @@
 function plotColorSpace(cs_image, rgb_image)
-    x = cs_image(:,:,1);
-    y = cs_image(:,:,2);
-    z = cs_image(:,:,3);
+    coord = reshape(cs_image, [], 3);
     color = reshape(rgb_image, [], 3);
+
+    x = coord(:,1);
+    y = coord(:,2);
+    z = coord(:,3);
+    
     scatter3(x(:), y(:), z(:), ones(size(x(:))), color);
-    xlabel('X'), ylabel('Y'), zlabel('Z');
+    xlabel('Y'), ylabel('Cb'), zlabel('Cr');
     axis square
     set(gca, 'Projection','perspective')
 end

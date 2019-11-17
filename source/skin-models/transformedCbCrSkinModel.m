@@ -1,8 +1,7 @@
 % Returns 1 for skin and 0 otherwise. Input can be either an image or a
 % single rgb vector, in which case the output is either a mask or a single
 % logical value respectively.
-function skin = skinModel(rgb)
-
+function skin = transformedCbCrSkinModel(rgb)
     [Y, Cb, Cr] = componentYCbCr(rgb, 255);
     
     W_Cb = 46.97; WL_Cb = 23;
