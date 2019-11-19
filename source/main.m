@@ -8,19 +8,18 @@ addpath(genpath('external'));
 
 global colormaps; colormaps = load('..\data\colormaps.mat');
 
-%image = imread('..\..\faces\image_0052.jpg');
-image = imread('..\data\DB2\bl_04.jpg');
-%image = imread('..\data\DB2\cl_01.jpg');
+% fix image_0138
+image = imread('..\..\faces\image_0210.jpg');
+%image = imread('..\data\DB2\bl_01.jpg');
+%image = imread('..\data\DB2\cl_16.jpg');
 %image = imread('..\data\DB2\il_16.jpg');
-%image = imread('..\data\DB1\db1_07.jpg');
+%image = imread('..\data\DB1\db1_16.jpg');
 image = im2double(image);
 image = whiteBalance(image);
 %imshow(image)
 %image = autoExposure(image);
 
 figure(1)
-subplot(2,2,1)
-imshow(image)
 subplot(2,2,2)
 face_mask = faceMask(image, true);
 
@@ -41,14 +40,25 @@ ellipse(S.MajorAxisLength/2, S.MinorAxisLength/2, deg2rad(-S.Orientation), x, y,
 
 subplot(2,2,4)
 imshow(eye_map);
-eye_mask = eye_map > 0.7;
-%contourf(eye_map)
-CC = bwconncomp(eye_mask);
-S = regionprops('table', CC, eye_map, 'Centroid', 'MajorAxisLength','MinorAxisLength','Orientation', 'WeightedCentroid');
-x = S.WeightedCentroid(:,1);
-y = S.WeightedCentroid(:,2);
-ellipse(S.MajorAxisLength/2, S.MinorAxisLength/2, deg2rad(-S.Orientation), x, y, 'r');
+% eye_mask = eye_map > graythresh(eye_map);
+% eye_CC = bwconncomp(eye_mask);
+% eye_labels = labelmatrix(eye_CC);
+% eye_S = regionprops('table',eye_CC, eye_map,'MajorAxisLength','MinorAxisLength','Orientation', 'MeanIntensity', 'WeightedCentroid', 'Area');
+% eye_mass = eye_S.Area .* eye_S.MeanIntensity;
+% %eye_mask = ismember(eye_labels, find(ratio <= min(ratio)));
+% disp(eye_S);
+% disp(eye_mass)
+% x = eye_S.WeightedCentroid(:,1);
+% y = eye_S.WeightedCentroid(:,2);
+% ellipse(eye_S.MajorAxisLength/2, eye_S.MinorAxisLength/2, deg2rad(-eye_S.Orientation), x, y, 'r');
 
+subplot(2,2,1)
+imshow(image)
+eyes = detectEyes(eye_map, upper_face);
+x = eyes(:,1);
+y = eyes(:,2);
+hold on; plot(x, y, 'b+', 'MarkerSize', 8, 'LineWidth', 2);
+hold off;
 % figure(2)
 % imshow(image);
 % hold on;

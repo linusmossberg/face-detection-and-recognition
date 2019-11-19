@@ -4,17 +4,22 @@ function result = faceMask(rgb_image, use_v_lim)
     
     skin = imclose(skin, true(2));
     
-    skin = bwareaopen(skin, 400, 8);
+    skin = bwareaopen(skin, 400, 4);
+    
+    result = skin;
     
     % Ruins a lot but required when for example  
     % beard cuts off mouth region from rest of face.
-    result = imclose(skin, strel('disk', 8));
-    %result = imclose(result, true(14));
+    result = imclose(result, strel('disk', 6));
+    %result = imclose(result, true(16));
     
     CC = bwconncomp(result);
     S = regionprops(CC, 'EulerNumber');
     L = labelmatrix(CC);
-    result = ismember(L, find([S.EulerNumber] < 1));
+    idx = find([S.EulerNumber] < 1);
+    if ~isempty(idx)
+        result = ismember(L, idx);
+    end
     
     result = imfill(result,'holes');
     
@@ -24,16 +29,18 @@ function result = faceMask(rgb_image, use_v_lim)
 %     stats = regionprops(result, 'Area');
 %     largest_area = max([stats.Area]);
 %     result = bwareaopen(result, largest_area);
-    
 
-    result = bwareaopen(result, 6000, 4);
+    result = bwareaopen(result, 10000, 4);
     
     CCs = bwconncomp(result);
-    testing = regionprops('table', CCs, 'MajorAxisLength','MinorAxisLength');
+    Ss = regionprops('table', CCs, 'MajorAxisLength','MinorAxisLength', 'Orientation');
     Ls = labelmatrix(CCs);
-    ratio = testing.MajorAxisLength ./ testing.MinorAxisLength;
-    result = ismember(Ls, find(ratio <= min(ratio)));
-
+    ratio = Ss.MajorAxisLength ./ Ss.MinorAxisLength;
+    orientation_lim = abs(abs(Ss.Orientation) - 90) < 45;
+    ratio(~orientation_lim) = 1000; % TODO: ugly solution, fix
+    idx = find(ratio <= min(ratio));
+    result = ismember(Ls, idx);
+    
     result = imclose(result, strel('disk',64));
     result = imfill(result,'holes');
     
@@ -49,7 +56,7 @@ function result = faceMask(rgb_image, use_v_lim)
     skin = ~skin;
     
     test = (result .* skin);
-    imshow(test * 0.5 + result * 0.5);
+    imshow((skin + test + result)/3);
     
     CC = bwconncomp(result);
     S = regionprops('table', CC, 'MajorAxisLength','MinorAxisLength','Orientation', 'Centroid');

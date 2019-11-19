@@ -37,7 +37,7 @@ function createRepresentativeFaceTiles()
         image = whiteBalance(image, omit_skin_model);
         image = imcrop(image, [min_c (max_c - min_c)]);
         
-        images{1, i} = im2uint8(image);
+        images{1, i} = im2uint16(image);
         i = i + 1;
     end
     %imshow(imtile(images));

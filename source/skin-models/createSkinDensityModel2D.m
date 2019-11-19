@@ -53,11 +53,11 @@ function SkinModel = createSkinDensityModel2D(rebuild)
         % color value is being evaluated.
         [counts, values] = imhist(density, grid_size.^2);
         mass = rescale(cumsum(counts.*values));
-        index = find(mass >= 0.66, 1, 'first');
-        single_color_threshold = values(index);
+        index = find(mass >= 0.7, 1, 'first');
+        single_color_threshold = values(index)
         %single_color_threshold = graythresh(density);
         
-        disp(graythresh(density))
+        %disp(graythresh(density))
 
         save('../data/skin-model/skin-model.mat', ...
             'density', ...
