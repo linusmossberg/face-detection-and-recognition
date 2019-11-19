@@ -1,5 +1,5 @@
-% Shifts hue 180 degrees to place skin tones (redish hues) at the 
-% center along the hue dimension of the HSV space.
+% Shifts hue 180 degrees to place skin tones (red hues) at the 
+% center along the hue dimension.
 
 function result = centerSkinHue(hsv)
     result = reshape(hsv, [], 3);

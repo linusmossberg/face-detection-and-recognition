@@ -7,6 +7,7 @@ function hullSkinModel3D()
     skin_vector = reshape(rep_faces(rep_faces_mask), [], 3);
     skin_vector = im2double(unique(skin_vector, 'rows'));
     skin_vector_ycbcr = rgb2ycbcr(skin_vector);
+    %skin_vector_ycbcr = rgb2ycgcr(skin_vector);
     
     skin_vector_ycbcr = filterYCbCr(skin_vector_ycbcr);
     
@@ -20,7 +21,7 @@ function hullSkinModel3D()
     
     %image = imread('..\data\DB1\db1_16.jpg');
     % 10
-    image = imread('..\data\DB2\cl_12.jpg');
+    image = imread('..\data\DB2\cl_10.jpg');
     image = im2double(image);
     image = whiteBalance(image);
     image = rgb2ycbcr(image);
@@ -40,6 +41,7 @@ function hullSkinModel3D()
     mask = ismember(L, find([S.EulerNumber] < 0));
     stats = regionprops(mask, 'Area');
 	mask = bwareaopen(mask, max([stats.Area]));
+    mask = imfill(mask,'holes');
     
     figure(1)
     subplot(1,3,1)

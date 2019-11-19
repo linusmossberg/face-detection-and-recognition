@@ -35,19 +35,28 @@ function result = whiteBalance(image, omit_skin_model)
     end
     
     mask = (gray_image >= intensity) & ~clipped;
-    num_pixels = sum(mask(:));
     illuminant = zeros(1,3);
     for c = 1:3
         channel = image(:,:,c);
-        illuminant(c) = sum(channel(mask)) / num_pixels;
+        illuminant(c) = mean(channel(mask));
     end
     
-%     illuminant = illumwhite(image, 11, 'Mask', ~clipped);
-%     illuminant = illumgray(image, 11, 'Mask', ~clipped);
+%     illuminant_w = illumwhite(image, 11, 'Mask', ~clipped);
+%     image_lin = rgb2lin(image);
+%     illuminant_gw = illumgray(image_lin, 10, 'Mask', ~clipped);
+    illuminant = illumpca(rgb2lin(image));
+    illuminant = lin2rgb(illuminant);
+    %illuminant = illumwhite(image_lin, 70, 'Mask', ~clipped);
     
-    if(~omit_skin_model && evaluateSkinDensityModel2D(illuminant))
+    skin_illuminant = false;
+    if(~omit_skin_model)
+        skin_illuminant = evaluateSkinDensityModel2D(illuminant);  
+    end
+    
+    if(skin_illuminant)
         disp('Skin illuminant');
         result = image;
+        %result = chromadapt(image, illuminant);
     else
         result = chromadapt(image, illuminant);
     end

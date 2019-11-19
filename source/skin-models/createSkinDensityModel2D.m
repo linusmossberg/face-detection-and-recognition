@@ -8,12 +8,14 @@
 
 function SkinModel = createSkinDensityModel2D(rebuild)
 
+    global colormaps;
+    
     if (rebuild || ~isfile('../data/skin-model/skin-model.mat'))
         
         % Load the tiled image of faces and the mask that locates the skin
         % patches on them.
         rep_faces = imread('../data/skin-model/representative_faces.png');
-        rep_faces_mask = imread('../data/skin-model/representative_faces_samples4.png');
+        rep_faces_mask = imread('../data/skin-model/representative_faces_samples_fill.png');
         rep_faces_mask = rep_faces_mask == 255;
         
         % Create a Nx3 vector with shifted and filtered HSV values of skin 
@@ -26,14 +28,17 @@ function SkinModel = createSkinDensityModel2D(rebuild)
     
         % Find the lower limit brightness value by finding the value 
         % above 1% of the outliers along Value dimension.
-        v_low = computeLowV(skin_vector_hsv, 0.005);
+        %v_low = computeLowV(skin_vector_hsv, 0.005);
+        %v_low = computeLowV(skin_vector_hsv, 0.003); %otsu
+        v_low = computeLowV(skin_vector_hsv, 0.01);
         
         % Create the density grid
-        grid_size = 64;
+        grid_size = 512; % 64 almost 100%, 512 same
         [N,C] = hist3(skin_vector_hsv(:,1:2), [grid_size,grid_size]);
         
         % Normalize to [0,1] and flatten density to make variation less extreme.
-        density = rescale(N).^(1/2.5);
+        %density = rescale(N).^(1/2.5);
+        density = rescale(N).^(1/3); % otsu
         
         h_values = cell2mat(C(1));
         s_values = cell2mat(C(2));
@@ -41,15 +46,18 @@ function SkinModel = createSkinDensityModel2D(rebuild)
         h_lim = [min(h_values()), max(h_values)];
         s_lim = [min(s_values()), max(s_values)];
         
-        skin_model_vis = im2uint8(imrotate(imresize(density, 16), 90));
-        imwrite(ind2rgb(skin_model_vis, jet(256)), '../data/skin-model/skin-model-vis.png');
+        skin_model_vis = im2uint8(imrotate(imresize(density, [512,512]), 90));
+        imwrite(ind2rgb(skin_model_vis, colormaps.RdYlBu), '../data/skin-model/skin-model-vis.png');
         
         % Find a suitable density threshold value to use when a single
         % color value is being evaluated.
         [counts, values] = imhist(density, grid_size.^2);
         mass = rescale(cumsum(counts.*values));
-        index = find(mass >= 0.1, 1, 'first');
+        index = find(mass >= 0.66, 1, 'first');
         single_color_threshold = values(index);
+        %single_color_threshold = graythresh(density);
+        
+        disp(graythresh(density))
 
         save('../data/skin-model/skin-model.mat', ...
             'density', ...
