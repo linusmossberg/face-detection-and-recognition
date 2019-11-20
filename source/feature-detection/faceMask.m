@@ -1,4 +1,4 @@
-function result = faceMask(rgb_image, use_v_lim)
+function [result, skin] = faceMask(rgb_image, use_v_lim)
 
     skin = evaluateSkinDensityModel2D(rgb_image, use_v_lim);
     

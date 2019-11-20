@@ -9,10 +9,11 @@ addpath(genpath('external'));
 global colormaps; colormaps = load('..\data\colormaps.mat');
 
 % fix image_0138
-image = imread('..\..\faces\image_0210.jpg');
-%image = imread('..\data\DB2\bl_01.jpg');
-%image = imread('..\data\DB2\cl_16.jpg');
-%image = imread('..\data\DB2\il_16.jpg');
+%image = imread('..\..\faces\image_0201.jpg');
+%image = imread('..\data\DB2\ex_12.jpg');
+%image = imread('..\data\DB2\bl_12.jpg');
+image = imread('..\data\DB2\cl_09.jpg');
+%image = imread('..\data\DB2\il_09.jpg');
 %image = imread('..\data\DB1\db1_16.jpg');
 image = im2double(image);
 image = whiteBalance(image);
@@ -21,11 +22,11 @@ image = whiteBalance(image);
 
 figure(1)
 subplot(2,2,2)
-face_mask = faceMask(image, true);
+[face_mask, skin] = faceMask(image, true);
 
 [lower_face, upper_face] = ellipseFaceRegions(face_mask);
 
-eye_map = eyeMap(image, upper_face);
+eye_map = eyeMap(image, upper_face & ~skin);
 mouth_map = mouthMap(image, lower_face);
 
 subplot(2,2,3)
@@ -53,8 +54,12 @@ imshow(eye_map);
 % ellipse(eye_S.MajorAxisLength/2, eye_S.MinorAxisLength/2, deg2rad(-eye_S.Orientation), x, y, 'r');
 
 subplot(2,2,1)
+
 imshow(image)
+%figure(2)
 eyes = detectEyes(eye_map, upper_face);
+figure(1)
+
 x = eyes(:,1);
 y = eyes(:,2);
 hold on; plot(x, y, 'b+', 'MarkerSize', 8, 'LineWidth', 2);
