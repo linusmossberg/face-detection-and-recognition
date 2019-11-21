@@ -2,9 +2,7 @@
 % skin point frequencies. High values within a bin in the grid
 % means that a lot of skin points are located at the bin location.
 % This can therefore be used to evaluate the probability of a color
-% being a skin color in the HSV color space. I use the word density 
-% instead of probability because probability implies that the sum of the 
-% grid values is 1, which is not the case here.
+% being a skin color in the HSV color space.
 
 function SkinModel = createSkinDensityModel2D(rebuild)
 
@@ -14,15 +12,18 @@ function SkinModel = createSkinDensityModel2D(rebuild)
         
         % Load the tiled image of faces and the mask that locates the skin
         % patches on them.
-        rep_faces = imread('../data/skin-model/representative_faces.png');
+        %rep_faces = imread('../data/skin-model/representative_faces.png');
+        rep_faces = createRepresentativeFaceTiles();
         rep_faces_mask = imread('../data/skin-model/representative_faces_samples_fill.png');
         rep_faces_mask = rep_faces_mask == 255;
         
         % Create a Nx3 vector with shifted and filtered HSV values of skin 
         % pixels from the tiled face image using the mask.
-        skin_vector = reshape(rep_faces(rep_faces_mask), [], 3);
-        skin_vector = im2double(skin_vector);
-        skin_vector_hsv = rgb2hsv(skin_vector);
+        rep_faces = rgb2hsv(rep_faces);
+        skin_vector_hsv = reshape(rep_faces(rep_faces_mask), [], 3);
+        %skin_vector = reshape(rep_faces(rep_faces_mask), [], 3);
+        %skin_vector = im2double(skin_vector);
+        %skin_vector_hsv = rgb2hsv(skin_vector);
         skin_vector_hsv = centerSkinHue(skin_vector_hsv);
         skin_vector_hsv = filterHS(skin_vector_hsv);
     
@@ -33,7 +34,7 @@ function SkinModel = createSkinDensityModel2D(rebuild)
         v_low = computeLowV(skin_vector_hsv, 0.01);
         
         % Create the density grid
-        grid_size = 512; % 64 almost 100%, 512 same
+        grid_size = 512;
         [N,C] = hist3(skin_vector_hsv(:,1:2), [grid_size,grid_size]);
         
         % Normalize to [0,1] and flatten density to make variation less extreme.
@@ -53,7 +54,7 @@ function SkinModel = createSkinDensityModel2D(rebuild)
         % color value is being evaluated.
         [counts, values] = imhist(density, grid_size.^2);
         mass = rescale(cumsum(counts.*values));
-        index = find(mass >= 0.7, 1, 'first');
+        index = find(mass >= 0.685, 1, 'first');
         single_color_threshold = values(index)
         %single_color_threshold = graythresh(density);
         

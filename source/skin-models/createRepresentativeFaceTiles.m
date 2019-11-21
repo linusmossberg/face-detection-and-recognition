@@ -1,4 +1,4 @@
-function createRepresentativeFaceTiles()
+function face_tiles = createRepresentativeFaceTiles()
     representative = [1,2,10,12,23,31,37,38,42,45,49,51,58,59,70,73,75,80, ...
     90,94,99,105, 114,120,123,127,136,137,142,143,144,152,159,161,163,165, ...
     166,167,171,174,175,183,188,189,190,201,204,209,210,217,218,222,225,243, ...
@@ -37,11 +37,13 @@ function createRepresentativeFaceTiles()
         image = whiteBalance(image, omit_skin_model);
         image = imcrop(image, [min_c (max_c - min_c)]);
         
-        images{1, i} = im2uint16(image);
+        %images{1, i} = im2uint16(image);
+        images{1, i} = image;
         i = i + 1;
     end
     %imshow(imtile(images));
-    imwrite(imtile(images), '../data/skin-model/representative_faces.png');
+    %imwrite(imtile(images), '../data/skin-model/representative_faces.png');
+    face_tiles = imtile(images);
 end
 
 % Old method that automatically picks 'good' images. Works pretty well but

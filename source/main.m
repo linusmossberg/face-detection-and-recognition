@@ -8,13 +8,16 @@ addpath(genpath('external'));
 
 global colormaps; colormaps = load('..\data\colormaps.mat');
 
-% fix image_0138
-%image = imread('..\..\faces\image_0201.jpg');
-%image = imread('..\data\DB2\ex_12.jpg');
-%image = imread('..\data\DB2\bl_12.jpg');
-image = imread('..\data\DB2\cl_09.jpg');
-%image = imread('..\data\DB2\il_09.jpg');
-%image = imread('..\data\DB1\db1_16.jpg');
+% fix image_0138 
+%TODO: if ellipse orientation fails, don't use skin mask on eye map
+% see image_0024
+image = imread('..\..\faces\image_0155.jpg');
+%image = imread('..\data\DB2\ex_01.jpg');
+%image = imread('..\data\DB2\bl_01.jpg');
+%image = imread('..\data\DB2\cl_01.jpg');
+%image = imread('..\data\DB2\il_16.jpg');
+%image = imread('..\data\DB1\db1_01.jpg');
+%image = imread('..\data\DB0\db0_4.jpg');
 image = im2double(image);
 image = whiteBalance(image);
 %imshow(image)
@@ -24,9 +27,14 @@ figure(1)
 subplot(2,2,2)
 [face_mask, skin] = faceMask(image, true);
 
+skin = imdilate(skin, strel('disk', 3));
+%skin = imdilate(skin, true(2));
+
 [lower_face, upper_face] = ellipseFaceRegions(face_mask);
 
-eye_map = eyeMap(image, upper_face & ~skin);
+eye_mask = upper_face & ~skin;
+
+eye_map = eyeMap(image, eye_mask);
 mouth_map = mouthMap(image, lower_face);
 
 subplot(2,2,3)
@@ -55,14 +63,29 @@ imshow(eye_map);
 
 subplot(2,2,1)
 
-imshow(image)
-%figure(2)
-eyes = detectEyes(eye_map, upper_face);
+eyes = detectEyes(eye_map, eye_mask);
 figure(1)
 
 x = eyes(:,1);
 y = eyes(:,2);
-hold on; plot(x, y, 'b+', 'MarkerSize', 8, 'LineWidth', 2);
+
+%[xmin ymin width height]
+
+x_width = max(x) - min(x);
+
+width = round(x_width * 2);
+xmin = min(x) - x_width * 0.5;
+ymin = min(y) - x_width * 0.5;
+height = width;
+
+crop_image = imcrop(image, [xmin ymin width height]);
+
+x = x - xmin;
+y = y - ymin;
+
+imshow(crop_image)
+hold on; plot(x, y, 'b.', 'MarkerSize', 16);
+plot(x, y, 'wx', 'MarkerSize', 5, 'LineWidth', 0.5);
 hold off;
 % figure(2)
 % imshow(image);

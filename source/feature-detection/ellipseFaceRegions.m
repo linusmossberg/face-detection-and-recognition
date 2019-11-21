@@ -24,11 +24,21 @@ function [lower_face, upper_face] = ellipseFaceRegions(face_mask)
 
         line_x = [Cx - b * cos(angle + pi/2), Cx + b * cos(angle + pi/2)];
         line_y = [Cy - b * sin(angle + pi/2), Cy + b * sin(angle + pi/2)];
+        
+        offset = 15;
+        angle = abs(angle);
+        line_x_offset = [offset * cos(angle), offset * cos(angle)];
+        line_y_offset = [offset * sin(angle), offset * sin(angle)];
+        
+        line_x = line_x + line_x_offset;
+        line_y = line_y + line_y_offset;
 
         above_face_line = (Y - line_y(1)) <= (((line_y(2) - line_y(1))/(line_x(2) - line_x(1)))*(X - line_x(1)));
-
+        
         upper_face = face_ellipse &  above_face_line & face_mask;
         lower_face = face_ellipse & ~above_face_line & face_mask;
+        %upper_face = face_ellipse & face_mask;
+        %lower_face = face_ellipse & face_mask;
     end
 end
 

@@ -43,7 +43,7 @@ function result = whiteBalance(image, omit_skin_model)
     
 %     illuminant_w = illumwhite(image, 11, 'Mask', ~clipped);
 %     image_lin = rgb2lin(image);
-%     illuminant_gw = illumgray(image_lin, 10, 'Mask', ~clipped);
+    %illuminant = illumgray(image, 10, 'Mask', ~clipped);
     illuminant = illumpca(rgb2lin(image));
     illuminant = lin2rgb(illuminant);
     %illuminant = illumwhite(image_lin, 70, 'Mask', ~clipped);
