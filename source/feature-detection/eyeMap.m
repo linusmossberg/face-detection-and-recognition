@@ -1,4 +1,7 @@
-function result = eyeMap(rgb_image, face_mask)
+% Result should also masked and normalized, but this is done by the caller.
+% The reason is that it can be usefull to keep the entire map when
+% detecting eyes.
+function result = eyeMap(rgb_image)
 
     [Y, Cb, Cr] = componentYCbCr(rgb_image);
 
@@ -16,7 +19,5 @@ function result = eyeMap(rgb_image, face_mask)
     result = eye_map_chroma .* eye_map_luma;
 
     result = imdilate(result, kernel);
-    result = result .* face_mask;
-    result = rescale(result);
 end
 

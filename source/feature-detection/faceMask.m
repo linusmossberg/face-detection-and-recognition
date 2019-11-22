@@ -1,10 +1,8 @@
-function [result, skin] = faceMask(rgb_image, use_v_lim)
+function [result, found] = faceMask(skin)
 
-    skin = evaluateSkinDensityModel2D(rgb_image, use_v_lim);
+    found = true;
     
-    %skin = imclose(skin, true(2));
-    
-    skin = bwareaopen(skin, 400, 4); % move
+    skin = bwareaopen(skin, 400, 4);
     
     % Ruins a lot but required when for example  
     % beard cuts off mouth region from rest of face.
@@ -20,23 +18,20 @@ function [result, skin] = faceMask(rgb_image, use_v_lim)
     end
     
     result = imfill(result,'holes');
-    
-%     result = imclose(result, strel('disk',8));
-%     result = imfill(result,'holes');
-    
-%     stats = regionprops(result, 'Area');
-%     largest_area = max([stats.Area]);
-%     result = bwareaopen(result, largest_area);
 
     result = bwareaopen(result, 10000, 4);
     
     CCs = bwconncomp(result);
-    Ss = regionprops('table', CCs, 'MajorAxisLength','MinorAxisLength', 'Orientation');
+    Ss = regionprops('table', CCs, 'MajorAxisLength','MinorAxisLength', 'Orientation', 'Eccentricity');
     Ls = labelmatrix(CCs);
     ratio = Ss.MajorAxisLength ./ Ss.MinorAxisLength;
     orientation_lim = abs(abs(Ss.Orientation) - 90) < 45;
-    ratio(~orientation_lim) = 1000; % TODO: ugly solution, fix
+    ratio(~orientation_lim) = [];
     idx = find(ratio <= min(ratio));
+    if isempty(idx)
+        found = false;
+        return;
+    end
     result = ismember(Ls, idx);
     
     result = imclose(result, strel('disk',64));
@@ -44,45 +39,53 @@ function [result, skin] = faceMask(rgb_image, use_v_lim)
     
     result = imerode(result, strel('disk',16));
     
-    %--------
-    
-    %result = imerode(result, strel('rectangle',[32,1]));
-    
-    result = bwareaopen(result, 6000, 4);
+    result = bwareaopen(result, 10000, 4);
     
     CCs = bwconncomp(result);
-    Ss = regionprops('table', CCs, 'MajorAxisLength','MinorAxisLength', 'Orientation');
+    Ss = regionprops('table', CCs, 'MajorAxisLength','MinorAxisLength', 'Orientation', 'Circularity');
     Ls = labelmatrix(CCs);
     ratio = Ss.MajorAxisLength ./ Ss.MinorAxisLength;
     orientation_lim = abs(abs(Ss.Orientation) - 90) < 45;
-    ratio(~orientation_lim) = 1000; % TODO: ugly solution, fix
+    ratio_lim = ratio < 3.5;
+    circularity_lim = Ss.Circularity > 0.28;
+    ratio(~orientation_lim) = [];
+    ratio(~ratio_lim) = []; 
+    ratio(~circularity_lim) = [];
     idx = find(ratio <= min(ratio));
+    
+    if isempty(idx)
+        found = false;
+        return;
+    end
+    
     result = ismember(Ls, idx);
     
-    %test = (result .* skin);
-    %imshow((test + result + skin)/3);
-    imshow(skin);
+    test = (result .* skin);
+    imshow((test + result + skin)/3);
+    %imshow(result);
     
     CC = bwconncomp(result);
     S = regionprops('table', CC, 'MajorAxisLength','MinorAxisLength','Orientation', 'Centroid');
-    x = S.Centroid(:,1);
-    y = S.Centroid(:,2);
-    
-    angle = -S.Orientation;
-    
-    ellipse(S.MajorAxisLength/2, S.MinorAxisLength/2, deg2rad(angle), x, y, 'r');
-    hold on;
-    plot(x, y, 'r.', 'MarkerSize', 32)
-    
-    xl = [x - S.MajorAxisLength/2 .* cos(deg2rad(angle)), x + S.MajorAxisLength/2 .* cos(deg2rad(angle))];
-    yl = [y - S.MajorAxisLength/2 .* sin(deg2rad(angle)), y + S.MajorAxisLength/2 .* sin(deg2rad(angle))];
-    line(xl,yl, 'Color','red', 'LineWidth',3)
-    
-    xl = [x - S.MinorAxisLength/2 .* cos(deg2rad(90 + angle)), x + S.MinorAxisLength/2 .* cos(deg2rad(90 + angle))];
-    yl = [y - S.MinorAxisLength/2 .* sin(deg2rad(90 + angle)), y + S.MinorAxisLength/2 .* sin(deg2rad(90 + angle))];
-    line(xl,yl, 'Color','red', 'LineWidth',3)
-    
-    hold off;
+    if size(S, 1) > 0
+        x = S.Centroid(:,1);
+        y = S.Centroid(:,2);
+
+        angle = -S.Orientation;
+
+        ellipse(S.MajorAxisLength/2, S.MinorAxisLength/2, deg2rad(angle), x, y, 'r');
+        hold on;
+        plot(x, y, 'r.', 'MarkerSize', 32)
+
+        xl = [x - S.MajorAxisLength/2 .* cos(deg2rad(angle)), x + S.MajorAxisLength/2 .* cos(deg2rad(angle))];
+        yl = [y - S.MajorAxisLength/2 .* sin(deg2rad(angle)), y + S.MajorAxisLength/2 .* sin(deg2rad(angle))];
+        line(xl,yl, 'Color','red', 'LineWidth',3)
+
+        xl = [x - S.MinorAxisLength/2 .* cos(deg2rad(90 + angle)), x + S.MinorAxisLength/2 .* cos(deg2rad(90 + angle))];
+        yl = [y - S.MinorAxisLength/2 .* sin(deg2rad(90 + angle)), y + S.MinorAxisLength/2 .* sin(deg2rad(90 + angle))];
+        line(xl,yl, 'Color','red', 'LineWidth',3)
+
+        hold off;
+    end
     
     
     % initial_contour_mask = bwconvhull(mask, 'Union');

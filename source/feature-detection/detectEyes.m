@@ -1,11 +1,22 @@
 % Iterative otsu thresholding of eye map to find the eyes.
 
-function eyes = detectEyes(eye_map, eye_mask)
+function eyes = detectEyes(rgb_image, eye_mask)
     imwrite(eye_mask, '0.png')
+    
+    orig_eye_map = eyeMap(rgb_image);
+    
+    imshow(rescale(orig_eye_map))
+    
+    eye_map = orig_eye_map .* eye_mask;
+    eye_map = rescale(eye_map);
     
     [eye_mask, initial_regions_found] = findInitialEyeRegions(eye_map, eye_map > 0.084);
     if initial_regions_found
-        eye_mask = imclose(eye_mask, true(6));
+        eye_mask = imclose(eye_mask, strel('disk', 32));
+        
+        % Reset the eye map to use with the cleaned up eye regions. This
+        % recovers parts that might have been masked earlier.
+        eye_map = orig_eye_map;
     end
     
     imwrite(eye_mask, '1.png')
@@ -24,7 +35,7 @@ function eyes = detectEyes(eye_map, eye_mask)
         
         imwrite(new_eye_mask, [num2str(i + 1)  '.png'])
         
-        eye_CC = bwconncomp(new_eye_mask);
+        eye_CC = bwconncomp(new_eye_mask, 4);
         eye_labels = labelmatrix(eye_CC);
         eye_S = regionprops('table',eye_CC, eye_map,'MeanIntensity', 'MaxIntensity', 'Area', 'WeightedCentroid', 'Circularity', 'Eccentricity');
         
@@ -42,8 +53,8 @@ function eyes = detectEyes(eye_map, eye_mask)
                 % important properties are weighted higher.
                 eye_space_vecs = zeros(5, size(eye_S,1));
                 eye_space_vecs(1,:) = normalizeProperty(eye_S.MeanIntensity);
-                eye_space_vecs(2,:) = normalizeProperty(eye_S.Area);
-                eye_space_vecs(3,:) = 1.2 * normalizeProperty(eye_S.MaxIntensity);
+                eye_space_vecs(2,:) = 1.7*normalizeProperty(eye_S.Area);
+                eye_space_vecs(3,:) = 1.2*normalizeProperty(eye_S.MaxIntensity);
                 eye_space_vecs(4,:) = normalizeProperty(1 - eye_S.Eccentricity);
                 eye_space_vecs(5,:) = normalizeProperty(1 - abs(eye_S.Circularity - 1));
                 
@@ -52,21 +63,21 @@ function eyes = detectEyes(eye_map, eye_mask)
                 eye_masses = sqrt(sum(eye_space_vecs.^2));
                 
                 pair_masses = zeros(1, size(eye_pairs, 1));
-                eye_dim_dists = zeros(1, size(eye_pairs, 1));
+                eye_space_dists = zeros(1, size(eye_pairs, 1));
                 
                 % Sum the mass of each eye pair and compute the 
                 % unsimilarity between eyes in a pair by calculating the
                 % distance between the eyes in eye property space.
                 for ep = 1:size(eye_pairs,1)
                     pair_masses(ep) = sum(eye_masses(eye_pairs(ep, :)));
-                    eye_dim_dists(ep) = pdist(eye_space_vecs(:, eye_pairs(ep, :))');
+                    eye_space_dists(ep) = pdist(eye_space_vecs(:, eye_pairs(ep, :))');
                 end
                 
                 % Compute final pair masses by combining the sum of each
                 % eye pair and the similarity of those pairs.
-                pair_similarities = 1 - rescale(eye_dim_dists);
+                pair_similarities = 1 - rescale(eye_space_dists);
                 pair_masses = normalizeProperty(pair_masses);
-                pair_masses = pair_masses + 0.16 * pair_similarities;
+                pair_masses = pair_masses + 0.14 * pair_similarities;
                 
                 % *defining separate eye property and eye similarity spaces
                 % might be worth it. Then properties like orientation could
@@ -90,7 +101,7 @@ function eyes = detectEyes(eye_map, eye_mask)
                 % result tends to get skewed too much towards the 
                 % brightest part, which might not be the center.
                 disp(min(eye_S.Area))
-                if(min(eye_S.Area) < 100)
+                if(min(eye_S.Area) <= 109)% prev 103
                     break;
                 end
             end
@@ -116,6 +127,8 @@ function eyes = detectEyes(eye_map, eye_mask)
         end
     end
     
+    imwrite(eye_mask, [num2str(i + 2)  '.png'])
+    
     disp(['Iterations: ' num2str(i)])
     
     eye_map(~eye_mask) = 0;
@@ -134,7 +147,7 @@ end
 function [eye_mask, initial_regions_found] = findInitialEyeRegions(eye_map, eye_mask)
     eye_mask = bwareaopen(eye_mask, 4^2, 4);
     
-    eye_CC = bwconncomp(eye_mask);
+    eye_CC = bwconncomp(eye_mask, 4);
     eye_labels = labelmatrix(eye_CC);
     eye_S = regionprops('table',eye_CC, eye_map,'MeanIntensity', 'MaxIntensity', 'Area', 'WeightedCentroid', 'Circularity', 'Eccentricity');
     
@@ -146,22 +159,22 @@ function [eye_mask, initial_regions_found] = findInitialEyeRegions(eye_map, eye_
         eye_space_vecs = zeros(5, size(eye_S,1));
         eye_space_vecs(1,:) = normalizeProperty(eye_S.MeanIntensity);
         eye_space_vecs(2,:) = normalizeProperty(eye_S.Area);
-        eye_space_vecs(3,:) = 1.2 * normalizeProperty(eye_S.MaxIntensity);
+        eye_space_vecs(3,:) = 2 * normalizeProperty(eye_S.MaxIntensity);
         eye_space_vecs(4,:) = normalizeProperty(1 - eye_S.Eccentricity);
         eye_space_vecs(5,:) = normalizeProperty(1 - abs(eye_S.Circularity - 1));
         
-        eye_space_vecs(2,:) = 0;
+        %eye_space_vecs(2,:) = 0;
             
         eye_masses = sqrt(sum(eye_space_vecs.^2));
 
         pair_masses = zeros(1, size(eye_pairs, 1));
-        eye_dim_dists = zeros(1, size(eye_pairs, 1));
+        eye_space_dists = zeros(1, size(eye_pairs, 1));
         for ep = 1:size(eye_pairs,1)
             pair_masses(ep) = sum(eye_masses(eye_pairs(ep, :)));
-            eye_dim_dists(ep) = pdist(eye_space_vecs(:, eye_pairs(ep, :))');
+            eye_space_dists(ep) = pdist(eye_space_vecs(:, eye_pairs(ep, :))');
         end
 
-        pair_similarities = 1 - rescale(eye_dim_dists);
+        pair_similarities = 1 - rescale(eye_space_dists);
         pair_masses = normalizeProperty(pair_masses);
 
         pair_masses = pair_masses + 0.16 * pair_similarities;
@@ -173,10 +186,11 @@ function [eye_mask, initial_regions_found] = findInitialEyeRegions(eye_map, eye_
 end
 
 % The orientation of the face mask ellipse could be used here to determine
-% the orientation of the eye pairs relative to the face.
+% the orientation of the eye pairs relative to face instead of the y-axis.
 function eye_pairs = findEyePairs(eye_positions)
     max_angle = 30;
     min_distance = 30;
+    max_distance = 300;
     
     num_pairs = 0;
     eye_pairs = [];
@@ -191,7 +205,7 @@ function eye_pairs = findEyePairs(eye_positions)
             distance = pdist([p1;p2]);
             
             valid_orient = orientation < max_angle || orientation > (180-max_angle);
-            valid_dist = distance > min_distance;
+            valid_dist = distance > min_distance && distance < max_distance;
             
             if(valid_orient && valid_dist)
                 num_pairs = num_pairs + 1;
@@ -201,7 +215,7 @@ function eye_pairs = findEyePairs(eye_positions)
     end
 end
 
-% Linearly normalizes a property vector to [>= 0 & <= 1.0 , 1.0]
+% Linearly normalizes a property vector to [[0.0, 1.0], 1.0]
 function normalized_property = normalizeProperty(property)
     normalized_property = property / max(property);
     if min(normalized_property) < 0

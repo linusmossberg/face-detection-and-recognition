@@ -25,6 +25,7 @@ function SkinModel = createSkinDensityModel2D(rebuild)
         %skin_vector = im2double(skin_vector);
         %skin_vector_hsv = rgb2hsv(skin_vector);
         skin_vector_hsv = centerSkinHue(skin_vector_hsv);
+        skin_vector_vis = skin_vector_hsv;
         skin_vector_hsv = filterHS(skin_vector_hsv);
     
         % Find the lower limit brightness value by finding the value 
@@ -38,8 +39,7 @@ function SkinModel = createSkinDensityModel2D(rebuild)
         [N,C] = hist3(skin_vector_hsv(:,1:2), [grid_size,grid_size]);
         
         % Normalize to [0,1] and flatten density to make variation less extreme.
-        %density = rescale(N).^(1/2.5);
-        density = rescale(N).^(1/3); % otsu
+        density = rescale(N).^(1/3);
         
         h_values = cell2mat(C(1));
         s_values = cell2mat(C(2));
@@ -49,6 +49,29 @@ function SkinModel = createSkinDensityModel2D(rebuild)
         
         skin_model_vis = im2uint8(imrotate(imresize(density, [512,512]), 90));
         imwrite(ind2rgb(skin_model_vis, colormaps.RdYlBu), '../data/skin-model/skin-model-vis.png');
+        
+%         [N_vis, C_vis] = hist3(skin_vector_vis(:,1:2), [512,512]);
+%         wx = C_vis{1}(:);
+%         wy = C_vis{2}(:);
+%         figure(10)
+%         H = pcolor(wx, wy, rescale(N_vis').^(1/3));
+%         set(gca,'Color',colormaps.RdYlBu(1,:))
+%         box on
+%         xlim([-1 1])
+%         ylim([-1 1])
+%         axis square
+%         shading interp
+%         set(H,'edgecolor','none');
+%         colorbar
+%         colormap(colormaps.RdYlBu)
+%         xlabel('Hue (degrees)')
+%         ylabel('Saturation')
+        
+%         hist3(skin_vector_vis(:,1:2), [512,512],'CDataMode','auto','FaceColor','interp','LineStyle','none','FaceLighting','gouraud','AmbientStrength',0.8)
+%         colorbar
+%         colormap(colormaps.RdYlBu)
+%         light('Position',[0.75 0.75 400],'Style','local')
+%         axis square
         
         % Find a suitable density threshold value to use when a single
         % color value is being evaluated.

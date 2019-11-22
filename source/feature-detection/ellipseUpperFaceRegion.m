@@ -1,9 +1,13 @@
-function [lower_face, upper_face] = ellipseFaceRegions(face_mask)
+function upper_face = ellipseUpperFaceRegion(face_mask)
     CC = bwconncomp(face_mask);
     S = regionprops('table', CC, 'MajorAxisLength','MinorAxisLength','Orientation', 'Centroid');
     
-    if(abs(abs(S.Orientation) - 90) > 45)
-        lower_face = face_mask;
+    invalid_angle = abs(abs(S.Orientation) - 90) > 45;
+    if isempty(invalid_angle)
+        invalid_angle = true;
+    end
+    
+    if(invalid_angle || size(S,1) <= 0)
         upper_face = face_mask;
     else
         Cx = S.Centroid(:,1);
@@ -36,9 +40,6 @@ function [lower_face, upper_face] = ellipseFaceRegions(face_mask)
         above_face_line = (Y - line_y(1)) <= (((line_y(2) - line_y(1))/(line_x(2) - line_x(1)))*(X - line_x(1)));
         
         upper_face = face_ellipse &  above_face_line & face_mask;
-        lower_face = face_ellipse & ~above_face_line & face_mask;
-        %upper_face = face_ellipse & face_mask;
-        %lower_face = face_ellipse & face_mask;
     end
 end
 

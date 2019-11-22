@@ -1,22 +1,55 @@
-% Performs automatic white balance correction on input image. Computes 
-% white balance illuminant by taking the average RGB value of the brightest 
-% pixels that contributes 50% of the total image brightness. The chromatic 
-% part is then corrected using chromadapt.
+
+function result = whiteBalance(image, omit_skin_model, type)
+
+    if(~exist('omit_skin_model','var') || isempty(omit_skin_model))
+        omit_skin_model = false;
+    end
+    
+    if(~exist('type','var') || isempty(type))
+        type = 'PCA';
+    end
+    
+    clipped = image > (1e-4 + 254/255);
+    clipped = clipped(:,:,1) | clipped(:,:,2) | clipped(:,:,3);
+    clipped = imdilate(clipped, strel('disk', 11));
+    
+    switch type
+        case 'PCA'
+            illuminant = illumpca(rgb2lin(image));
+            illuminant = lin2rgb(illuminant);
+        case 'GW'
+            illuminant = illumgray(rgb2lin(image), 10, 'Mask', ~clipped);
+            illuminant = lin2rgb(illuminant);
+        case 'gray-contrib'
+            illuminant = grayContribGW(image, clipped);
+        otherwise
+            illuminant = illumpca(rgb2lin(image));
+            illuminant = lin2rgb(illuminant);
+    end
+    
+    skin_illuminant = false;
+    if(~omit_skin_model)
+        skin_illuminant = evaluateSkinDensityModel2D(illuminant);  
+    end
+    
+    if(skin_illuminant)
+        disp('Skin illuminant');
+        result = image;
+    else
+        result = chromadapt(image, illuminant);
+    end
+    
+end
+
+% Computes white balance illuminant by taking the average RGB value of the 
+% brightest pixels that contributes 50% of the total image brightness.
 
 % This should technically be linearized in order to find the pixels that
 % truly contribute 50% of the brightness, otherwise each pixel channel is
 % pushed above its true value by the gamma curve. However, 50% is just an
 % arbitrary number that works well on images with gamma correction applied.
 
-function result = whiteBalance(image, omit_skin_model)
-
-    if(~exist('omit_skin_model','var') || isempty(omit_skin_model))
-        omit_skin_model = false;
-    end
-
-    clipped = image > (1e-4 + 254/255);
-    clipped = clipped(:,:,1) | clipped(:,:,2) | clipped(:,:,3);
-    clipped = imdilate(clipped, strel('disk', 11));
+function illuminant = grayContribGW(image, clipped)
 
     gray_image = rgb2gray(image);
     gray_vec = gray_image(~clipped); % remove overexposed pixels
@@ -39,26 +72,6 @@ function result = whiteBalance(image, omit_skin_model)
     for c = 1:3
         channel = image(:,:,c);
         illuminant(c) = mean(channel(mask));
-    end
-    
-%     illuminant_w = illumwhite(image, 11, 'Mask', ~clipped);
-%     image_lin = rgb2lin(image);
-    %illuminant = illumgray(image, 10, 'Mask', ~clipped);
-    illuminant = illumpca(rgb2lin(image));
-    illuminant = lin2rgb(illuminant);
-    %illuminant = illumwhite(image_lin, 70, 'Mask', ~clipped);
-    
-    skin_illuminant = false;
-    if(~omit_skin_model)
-        skin_illuminant = evaluateSkinDensityModel2D(illuminant);  
-    end
-    
-    if(skin_illuminant)
-        disp('Skin illuminant');
-        result = image;
-        %result = chromadapt(image, illuminant);
-    else
-        result = chromadapt(image, illuminant);
     end
 end
 
