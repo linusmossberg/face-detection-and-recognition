@@ -8,6 +8,14 @@ function SkinModel = createSkinDensityModel2D(rebuild)
 
     global colormaps;
     
+    persistent SkinModel_;
+    
+    % Don't recompute if SkinModel_ already has been computed/loaded.
+    if ~isempty(SkinModel_) && ~rebuild
+        SkinModel = SkinModel_;
+        return;
+    end
+    
     if (rebuild || ~isfile('../data/skin-model/skin-model.mat'))
         
         % Load the tiled image of faces and the mask that locates the skin
@@ -93,6 +101,8 @@ function SkinModel = createSkinDensityModel2D(rebuild)
     end
     
     SkinModel = load('../data/skin-model/skin-model.mat');
+    
+    SkinModel_ = SkinModel;
 end
 
 % Finds the percentage% low cutoff of Value dimension in HSV space.

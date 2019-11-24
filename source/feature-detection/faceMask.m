@@ -26,7 +26,7 @@ function [result, found] = faceMask(skin)
     Ls = labelmatrix(CCs);
     ratio = Ss.MajorAxisLength ./ Ss.MinorAxisLength;
     orientation_lim = abs(abs(Ss.Orientation) - 90) < 45;
-    ratio(~orientation_lim) = [];
+    ratio(~orientation_lim) = max(ratio) + 1;
     idx = find(ratio <= min(ratio));
     if isempty(idx)
         found = false;
@@ -42,50 +42,55 @@ function [result, found] = faceMask(skin)
     result = bwareaopen(result, 10000, 4);
     
     CCs = bwconncomp(result);
-    Ss = regionprops('table', CCs, 'MajorAxisLength','MinorAxisLength', 'Orientation', 'Circularity');
+    Ss = regionprops('table', CCs, 'MajorAxisLength','MinorAxisLength', ...
+                     'Orientation', 'Circularity', 'Eccentricity');
     Ls = labelmatrix(CCs);
     ratio = Ss.MajorAxisLength ./ Ss.MinorAxisLength;
     orientation_lim = abs(abs(Ss.Orientation) - 90) < 45;
-    ratio_lim = ratio < 3.5;
     circularity_lim = Ss.Circularity > 0.28;
-    ratio(~orientation_lim) = [];
-    ratio(~ratio_lim) = []; 
-    ratio(~circularity_lim) = [];
+    eccentricity_lim = Ss.Eccentricity < 0.96;
+    ratio_lim = ratio < 3.8; % 3.5 ratio orig
+    max_ratio = max(ratio);
+    ratio(~orientation_lim) = max_ratio + 1;
+    ratio(~circularity_lim) = max_ratio + 1;
+    ratio(~eccentricity_lim) = max_ratio + 1;
+    ratio(~ratio_lim) = max_ratio + 1;
     idx = find(ratio <= min(ratio));
     
-    if isempty(idx)
+    if isempty(idx) || ~ratio_lim(idx) || ~orientation_lim(idx) || ~circularity_lim(idx) || ~eccentricity_lim(idx)
         found = false;
         return;
     end
     
     result = ismember(Ls, idx);
     
-    test = (result .* skin);
-    imshow((test + result + skin)/3);
-    %imshow(result);
     
-    CC = bwconncomp(result);
-    S = regionprops('table', CC, 'MajorAxisLength','MinorAxisLength','Orientation', 'Centroid');
-    if size(S, 1) > 0
-        x = S.Centroid(:,1);
-        y = S.Centroid(:,2);
-
-        angle = -S.Orientation;
-
-        ellipse(S.MajorAxisLength/2, S.MinorAxisLength/2, deg2rad(angle), x, y, 'r');
-        hold on;
-        plot(x, y, 'r.', 'MarkerSize', 32)
-
-        xl = [x - S.MajorAxisLength/2 .* cos(deg2rad(angle)), x + S.MajorAxisLength/2 .* cos(deg2rad(angle))];
-        yl = [y - S.MajorAxisLength/2 .* sin(deg2rad(angle)), y + S.MajorAxisLength/2 .* sin(deg2rad(angle))];
-        line(xl,yl, 'Color','red', 'LineWidth',3)
-
-        xl = [x - S.MinorAxisLength/2 .* cos(deg2rad(90 + angle)), x + S.MinorAxisLength/2 .* cos(deg2rad(90 + angle))];
-        yl = [y - S.MinorAxisLength/2 .* sin(deg2rad(90 + angle)), y + S.MinorAxisLength/2 .* sin(deg2rad(90 + angle))];
-        line(xl,yl, 'Color','red', 'LineWidth',3)
-
-        hold off;
-    end
+    
+%     test = (result .* skin);
+%     imshow((test + result + skin)/3);
+%     
+%     CC = bwconncomp(result);
+%     S = regionprops('table', CC, 'MajorAxisLength','MinorAxisLength','Orientation', 'Centroid');
+%     if size(S, 1) > 0
+%         x = S.Centroid(:,1);
+%         y = S.Centroid(:,2);
+% 
+%         angle = -S.Orientation;
+% 
+%         ellipse(S.MajorAxisLength/2, S.MinorAxisLength/2, deg2rad(angle), x, y, 'r');
+%         hold on;
+%         plot(x, y, 'r.', 'MarkerSize', 32)
+% 
+%         xl = [x - S.MajorAxisLength/2 .* cos(deg2rad(angle)), x + S.MajorAxisLength/2 .* cos(deg2rad(angle))];
+%         yl = [y - S.MajorAxisLength/2 .* sin(deg2rad(angle)), y + S.MajorAxisLength/2 .* sin(deg2rad(angle))];
+%         line(xl,yl, 'Color','red', 'LineWidth',3)
+% 
+%         xl = [x - S.MinorAxisLength/2 .* cos(deg2rad(90 + angle)), x + S.MinorAxisLength/2 .* cos(deg2rad(90 + angle))];
+%         yl = [y - S.MinorAxisLength/2 .* sin(deg2rad(90 + angle)), y + S.MinorAxisLength/2 .* sin(deg2rad(90 + angle))];
+%         line(xl,yl, 'Color','red', 'LineWidth',3)
+% 
+%         hold off;
+%     end
     
     
     % initial_contour_mask = bwconvhull(mask, 'Union');

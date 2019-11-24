@@ -7,7 +7,5 @@ function result = mouthMap(rgb_image, face_mask)
     
     kernel = strel('disk', 8);
     result = imdilate(result, kernel);
-    result = result .* face_mask;
-    result = rescale(result);
 end
 

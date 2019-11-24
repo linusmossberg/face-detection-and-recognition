@@ -1,11 +1,8 @@
 % Iterative otsu thresholding of eye map to find the eyes.
 
 function eyes = detectEyes(rgb_image, eye_mask)
-    imwrite(eye_mask, '0.png')
-    
+
     orig_eye_map = eyeMap(rgb_image);
-    
-    imshow(rescale(orig_eye_map))
     
     eye_map = orig_eye_map .* eye_mask;
     eye_map = rescale(eye_map);
@@ -19,8 +16,6 @@ function eyes = detectEyes(rgb_image, eye_mask)
         eye_map = orig_eye_map;
     end
     
-    imwrite(eye_mask, '1.png')
-    
     flatten_process = false;
     
     % 10 is arbitrary, the loop usually breaks sooner.
@@ -33,11 +28,12 @@ function eyes = detectEyes(rgb_image, eye_mask)
         
         new_eye_mask = bwareaopen(new_eye_mask, 4^2, 4);
         
-        imwrite(new_eye_mask, [num2str(i + 1)  '.png'])
-        
         eye_CC = bwconncomp(new_eye_mask, 4);
         eye_labels = labelmatrix(eye_CC);
-        eye_S = regionprops('table',eye_CC, eye_map,'MeanIntensity', 'MaxIntensity', 'Area', 'WeightedCentroid', 'Circularity', 'Eccentricity');
+        eye_S = regionprops('table', eye_CC, eye_map, ...
+                             'MeanIntensity', 'MaxIntensity', ...
+                             'Area', 'WeightedCentroid', ...
+                             'Circularity', 'Eccentricity');
         
         % Find possible eye pairs
         eye_pairs = findEyePairs(eye_S.WeightedCentroid);
@@ -92,7 +88,7 @@ function eyes = detectEyes(rgb_image, eye_mask)
                 
                 % Only one eye map intensity left and both eyes has it, no
                 % more thresholding can be done.
-                if(eye_mask == new_eye_mask), break; end
+                if(all(eye_mask == new_eye_mask, 'all')), break; end
                 
                 % Continue thresholding to refine
                 eye_mask = new_eye_mask;
@@ -100,8 +96,8 @@ function eyes = detectEyes(rgb_image, eye_mask)
                 % Stop refining if eyes are small enough. Otherwise the
                 % result tends to get skewed too much towards the 
                 % brightest part, which might not be the center.
-                disp(min(eye_S.Area))
-                if(min(eye_S.Area) <= 109)% prev 103
+                
+                if(min(eye_S.Area) <= 109)
                     break;
                 end
             end
@@ -119,24 +115,36 @@ function eyes = detectEyes(rgb_image, eye_mask)
             % trying to find and refine a smaller eye region within them. 
             if(initial_regions_found), break; end
             
+            if(flatten_process || all(eye_mask == new_eye_mask, 'all'))
+                break;
+            end
+            
             eye_map = eye_map .^ (1/4);
-            if ~flatten_process, disp('One eye'); end
             flatten_process = true;
         else
             break;
         end
     end
     
-    imwrite(eye_mask, [num2str(i + 2)  '.png'])
-    
-    disp(['Iterations: ' num2str(i)])
-    
     eye_map(~eye_mask) = 0;
     eye_map = rescale(eye_map);
     eye_CC = bwconncomp(eye_mask);
     eye_S = regionprops('table',eye_CC, eye_map,'WeightedCentroid', 'Centroid');
     
-    eyes = eye_S.WeightedCentroid;
+    eyes = struct;
+    if(size(eye_S, 1) >= 2)
+        
+        eye_pairs = findEyePairs(eye_S.WeightedCentroid);
+        if(~isempty(eye_pairs))
+            % TODO: pick best pair if there are more than one
+            
+            %[~, left_eye_idx] = min(eye_S.WeightedCentroid(:,1));
+            %[~, right_eye_idx] = max(eye_S.WeightedCentroid(:,1));
+
+            eyes.left = eye_S.WeightedCentroid(eye_pairs(1,1),:);
+            eyes.right = eye_S.WeightedCentroid(eye_pairs(1,2),:);
+        end
+    end
 end
 
 % Currently more or less the same as one iterative step in detectEyes() 
@@ -149,7 +157,10 @@ function [eye_mask, initial_regions_found] = findInitialEyeRegions(eye_map, eye_
     
     eye_CC = bwconncomp(eye_mask, 4);
     eye_labels = labelmatrix(eye_CC);
-    eye_S = regionprops('table',eye_CC, eye_map,'MeanIntensity', 'MaxIntensity', 'Area', 'WeightedCentroid', 'Circularity', 'Eccentricity');
+    eye_S = regionprops('table',eye_CC, eye_map, ...
+                        'MeanIntensity', 'MaxIntensity', ...
+                        'Area', 'WeightedCentroid', ...
+                        'Circularity', 'Eccentricity');
     
     eye_pairs = findEyePairs(eye_S.WeightedCentroid);
     
@@ -201,11 +212,23 @@ function eye_pairs = findEyePairs(eye_positions)
             p1 = eye_positions(i, :);
             p2 = eye_positions(j, :);
             
-            orientation = abs(rad2deg(atan2(p2(2)-p1(2), (p2(1) - p1(1)))));
-            distance = pdist([p1;p2]);
+            if(p1(1) > p2(1))
+                [p2, p1] = deal(p1, p2);
+            end
             
-            valid_orient = orientation < max_angle || orientation > (180-max_angle);
-            valid_dist = distance > min_distance && distance < max_distance;
+            L2R = p2 - p1;
+            eye_dist = sqrt(sum(L2R.^2));
+            L2R_unit = L2R / eye_dist;
+    
+            cos_a = L2R_unit(1);
+            sin_a = L2R_unit(2);
+            
+            orientation = -rad2deg(atan2(sin_a, cos_a));
+            
+            %orientation = abs(rad2deg(atan2(p2(2)-p1(2), (p2(1) - p1(1)))));
+            
+            valid_orient = abs(orientation) < max_angle;
+            valid_dist = eye_dist > min_distance && eye_dist < max_distance;
             
             if(valid_orient && valid_dist)
                 num_pairs = num_pairs + 1;

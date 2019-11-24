@@ -1,7 +1,8 @@
 function upper_face = ellipseUpperFaceRegion(face_mask)
     CC = bwconncomp(face_mask);
-    S = regionprops('table', CC, 'MajorAxisLength','MinorAxisLength','Orientation', 'Centroid');
-    
+    S = regionprops('table', CC, 'MajorAxisLength','MinorAxisLength', ...
+                    'Orientation', 'Centroid');
+                
     invalid_angle = abs(abs(S.Orientation) - 90) > 45;
     if isempty(invalid_angle)
         invalid_angle = true;
@@ -29,7 +30,7 @@ function upper_face = ellipseUpperFaceRegion(face_mask)
         line_x = [Cx - b * cos(angle + pi/2), Cx + b * cos(angle + pi/2)];
         line_y = [Cy - b * sin(angle + pi/2), Cy + b * sin(angle + pi/2)];
         
-        offset = 15;
+        offset = 25;
         angle = abs(angle);
         line_x_offset = [offset * cos(angle), offset * cos(angle)];
         line_y_offset = [offset * sin(angle), offset * sin(angle)];

@@ -1,16 +1,11 @@
-function skin = evaluateSkinDensityModel2D(rgb, use_v_lim)
+function [skin, skin_unlim] = evaluateSkinDensityModel2D(rgb)
 
-    if(~exist('use_v_lim','var') || isempty(use_v_lim))
-        use_v_lim = true;
-    end
-    
     SM = createSkinDensityModel2D(false);
     hsv = rgb2hsv(rgb);
     hsv = centerSkinHue(hsv);
     
     is_image = length(size(hsv)) == 3;
-    
-    global colormaps;
+    %global colormaps;
     
     if(is_image)
         h = hsv(:,:,1);
@@ -26,7 +21,7 @@ function skin = evaluateSkinDensityModel2D(rgb, use_v_lim)
         
         % Another alterative is otsu, but it's often too effective and
         % removes underrepresented pixels.
-        skin = skin_density_image > graythresh(skin_density_image);
+        skin_unlim = skin_density_image > graythresh(skin_density_image);
         
         % Compute brightness (value) threshold limit of the resulting 
         % pixels using otsu and set any pixels that falls under this 
@@ -35,15 +30,14 @@ function skin = evaluateSkinDensityModel2D(rgb, use_v_lim)
         % saturation but are less bright than what skin pixels tend to be. 
         % This assumes that skin pixels generally are brighter, which most 
         % often is the case for the caltech dataset.
-        if(use_v_lim)
-            value_vec = v(skin);
-            value_threshold = min(graythresh(value_vec), SM.v_low);
-            value_mask = v < value_threshold;
-            skin(value_mask) = 0;
-            skin_density_image(value_mask) = 0;
-        end
+        skin = skin_unlim;
+        value_vec = v(skin);
+        value_threshold = min(graythresh(value_vec), SM.v_low);
+        value_mask = v < value_threshold;
+        skin(value_mask) = 0;
+        %skin_density_image(value_mask) = 0;
 
-        imwrite(ind2rgb(im2uint8(skin_density_image), colormaps.RdYlBu), '../data/skin-model/skin-density-image-vis.png');
+        %imwrite(ind2rgb(im2uint8(skin_density_image), colormaps.RdYlBu), '../data/skin-model/skin-density-image-vis.png');
         
     else
         h = hsv(1);
@@ -52,13 +46,9 @@ function skin = evaluateSkinDensityModel2D(rgb, use_v_lim)
         
         skin_density = getDensity(h, s, SM);
         
-        skin = skin_density > SM.single_color_threshold;
+        skin_unlim = skin_density > SM.single_color_threshold;
         
-        disp(skin_density)
-        
-        if(use_v_lim)
-            skin = skin & v > SM.v_low;
-        end
+        skin = skin_unlim & v > SM.v_low;
     end
 end
 
@@ -83,11 +73,12 @@ function density = getDensity(h, s, SM)
     h_lerp = (1 + h_pos * (SM.grid_size - 1)) - h_idx;
     s_lerp = (1 + s_pos * (SM.grid_size - 1)) - s_idx;
     
+    % 2x2 densities of the corners of the cell 
+    % that contains this hue/sat coordinate.
     d = cell(2,2);
     d(1:2, 1:2) = { zeros(size(h)) };
     
-    % 2x2 densities of the corners of the cell 
-    % that contains this hue/sat coordinate.
+    % Access density grid with (col-1)*row_width+row to vectorize lookup
     d{1,1}(IB) = SM.density((s_idx(IB) - 1) * SM.grid_size + h_idx(IB));
     d{2,1}(IB) = SM.density( s_idx(IB)      * SM.grid_size + h_idx(IB));
     d{1,2}(IB) = SM.density((s_idx(IB) - 1) * SM.grid_size + h_idx(IB) + 1);
