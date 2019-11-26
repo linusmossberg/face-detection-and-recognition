@@ -28,9 +28,14 @@ while true
     image = imread(['..\..\faces\image_' num2str(image_num,'%04d') '.jpg']);
     image = im2double(image);
     figure(1)
+    subplot(1,2,1)
     imshow(image)
     text(25,25,['Image: ' num2str(image_num)], 'FontSize',18, 'Color', 'w');
-    detectFaceTriangle2(image);
+    face_triangle = detectFaceTriangle2(image);
+    if(~isempty(fieldnames(face_triangle)))
+        subplot(1,2,2)
+        imshow(transformFace(image, face_triangle));
+    end
 end
     
 %     tic
