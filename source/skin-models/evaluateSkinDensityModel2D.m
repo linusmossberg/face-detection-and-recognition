@@ -11,17 +11,12 @@ function [skin, skin_unlim] = evaluateSkinDensityModel2D(rgb)
         h = hsv(:,:,1);
         s = hsv(:,:,2);
         v = hsv(:,:,3);
-        skin_density_image = getDensity(h, s, SM);
+        skin_probability_image = getDensity(h, s, SM);
         
-        % Use the average density of the skin density image as threshold
-        % value to mask out the most probable skin pixels. This only
+        % Use otsu thresholding on the skin probability image. This only 
         % compares images against themselves, which works well for 
-        % detecting underrepresented skin hues in the skin model.
-        %skin = skin_density_image > mean(skin_density_image(:));
-        
-        % Another alterative is otsu, but it's often too effective and
-        % removes underrepresented pixels.
-        skin_unlim = skin_density_image > graythresh(skin_density_image);
+        % detecting underrepresented skin hues.
+        skin_unlim = skin_probability_image > graythresh(skin_probability_image);
         
         % Compute brightness (value) threshold limit of the resulting 
         % pixels using otsu and set any pixels that falls under this 
@@ -35,9 +30,9 @@ function [skin, skin_unlim] = evaluateSkinDensityModel2D(rgb)
         value_threshold = min(graythresh(value_vec), SM.v_low);
         value_mask = v < value_threshold;
         skin(value_mask) = 0;
-        %skin_density_image(value_mask) = 0;
-
-        %imwrite(ind2rgb(im2uint8(skin_density_image), colormaps.RdYlBu), '../data/skin-model/skin-density-image-vis.png');
+        
+        %skin_probability_image(value_mask) = 0;
+        %imwrite(ind2rgb(im2uint8(skin_probability_image), colormaps.RdYlBu), '../data/skin-model/skin-density-image-vis.png');
         
     else
         h = hsv(1);
@@ -92,7 +87,7 @@ function density = getDensity(h, s, SM)
     density = d11_d21 + s_lerp .* (d12_d22 - d11_d21);
 end
 
-% Slow and more readable method to get density of one hue+sat scalar pair.
+% Slow but more readable method to get density of one hue+sat scalar pair.
 function density = expressiveSingleGetDensity(h, s, SM)
     
     % Find position normalized to [0,1[ in limit range for each dim.

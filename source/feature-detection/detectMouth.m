@@ -94,7 +94,7 @@ function mouth = detectMouth(eyes, image)
     debug_ = true;
     
     if(exist('debug_','var') && debug_)
-        figure(1)
+        %figure(1)
         debugPlot(mouth, eyes, image, mouth_ellipse, mouth_map);
     end
 end
@@ -103,7 +103,7 @@ function debugPlot(mouth, eyes, image, mouth_ellipse, mouth_map)
     debug_img = applyMask(image, ~mouth_ellipse);
     rgb_mm = cat(3, mouth_map, mouth_map, mouth_map);
     debug_img = debug_img + applyMask(rgb_mm, mouth_ellipse);
-    imshow(image)
+    %imshow(image)
 
     x = [eyes.left(1) eyes.right(1) mouth(1)];
     y = [eyes.left(2) eyes.right(2) mouth(2)];

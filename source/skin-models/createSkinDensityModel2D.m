@@ -6,7 +6,7 @@
 
 function SkinModel = createSkinDensityModel2D(rebuild)
 
-    global colormaps;
+    %global colormaps;
     
     persistent SkinModel_;
     
@@ -55,8 +55,8 @@ function SkinModel = createSkinDensityModel2D(rebuild)
         h_lim = [min(h_values()), max(h_values)];
         s_lim = [min(s_values()), max(s_values)];
         
-        skin_model_vis = im2uint8(imrotate(imresize(density, [512,512]), 90));
-        imwrite(ind2rgb(skin_model_vis, colormaps.RdYlBu), '../data/skin-model/skin-model-vis.png');
+        %skin_model_vis = im2uint8(imrotate(imresize(density, [512,512]), 90));
+        %imwrite(ind2rgb(skin_model_vis, colormaps.RdYlBu), '../data/skin-model/skin-model-vis.png');
         
 %         [N_vis, C_vis] = hist3(skin_vector_vis(:,1:2), [512,512]);
 %         wx = C_vis{1}(:);
