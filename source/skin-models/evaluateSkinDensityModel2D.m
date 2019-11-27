@@ -14,6 +14,7 @@ function [skin, skin_unlim] = evaluateSkinDensityModel2D(rgb)
         h = hsv(:,:,1);
         s = hsv(:,:,2);
         v = hsv(:,:,3);
+        
         skin_probability_image = getDensity(h, s, SM);
         
         % Use otsu thresholding on the skin probability image. This only 

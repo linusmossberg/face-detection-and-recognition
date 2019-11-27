@@ -25,9 +25,7 @@ function eyes = detectEyes(image, eye_mask)
         eye_map = rescale(eye_map);
         
         new_eye_mask = eye_map > graythresh(eye_map(eye_mask));
-        
         new_eye_mask = bwareaopen(new_eye_mask, 4^2, 4);
-        
         new_eye_mask = imopen(new_eye_mask, strel('disk', 5));
         
         eye_CC = bwconncomp(new_eye_mask, 4);
@@ -43,15 +41,18 @@ function eyes = detectEyes(image, eye_mask)
         if(size(eye_S,1) >= 2 && ~isempty(eye_pairs))
             
             if(size(eye_S,1) > 2)
-                
                 % Eye property space vector defined such that
                 % increasing values in each dimension means that the region
                 % is more eye-like in that dimension. Typically each
                 % dimension is defined in the range [0,1] but some more
                 % important properties are weighted higher.
+                
+                y_max = max(eye_S.WeightedCentroid(:,2));
+                y_min = min(eye_S.WeightedCentroid(:,2));
+                
                 eye_space_vecs = zeros(5, size(eye_S,1));
-                eye_space_vecs(1,:) = normalizeProperty(eye_S.MeanIntensity);
-                eye_space_vecs(2,:) = 1.7*normalizeProperty(eye_S.Area);
+                eye_space_vecs(1,:) = 2*normalizeProperty(eye_S.MeanIntensity .* eye_S.Area);
+                eye_space_vecs(2,:) = (eye_S.WeightedCentroid(:,2) - y_min) / (y_max - y_min);
                 eye_space_vecs(3,:) = 1.2*normalizeProperty(eye_S.MaxIntensity);
                 eye_space_vecs(4,:) = 2*normalizeProperty(1 - eye_S.Eccentricity);
                 eye_space_vecs(5,:) = normalizeProperty(1 - abs(eye_S.Circularity - 1));
@@ -169,12 +170,13 @@ function [eye_mask, initial_regions_found] = findInitialEyeRegions(eye_map, eye_
     initial_regions_found = size(eye_S,1) >= 2 && ~isempty(eye_pairs);
     
     if(initial_regions_found)
+                
         eye_space_vecs = zeros(5, size(eye_S,1));
         eye_space_vecs(1,:) = normalizeProperty(eye_S.MeanIntensity);
         eye_space_vecs(2,:) = normalizeProperty(eye_S.Area);
         eye_space_vecs(3,:) = 2 * normalizeProperty(eye_S.MaxIntensity);
         eye_space_vecs(4,:) = normalizeProperty(1 - eye_S.Eccentricity);
-        eye_space_vecs(5,:) = normalizeProperty(1 - abs(eye_S.Circularity - 1));
+        eye_space_vecs(5,:) = 1.5*normalizeProperty(1 - abs(eye_S.Circularity - 1));
         
         %eye_space_vecs(2,:) = 0;
             

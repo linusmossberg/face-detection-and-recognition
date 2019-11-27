@@ -27,13 +27,13 @@ function SkinModel = createSkinDensityModel2D(rebuild)
         rep_faces = rgb2hsv(rep_faces);
         skin_vector_hsv = reshape(rep_faces(rep_faces_mask), [], 3);
         skin_vector_hsv = centerSkinHue(skin_vector_hsv);
-        skin_vector_vis = skin_vector_hsv;
-        skin_vector_hsv = filterHS(skin_vector_hsv);
         
         if(true)
-            plotModel(skin_vector_vis);
+            plotModel(skin_vector_hsv);
         end
-    
+        
+        skin_vector_hsv = filterHS(skin_vector_hsv);
+        
         % Find the lower limit brightness value by finding the value 
         % above 1% of the outliers along Value dimension.
         v_low = computeLowV(skin_vector_hsv, 0.01);
@@ -122,14 +122,14 @@ end
 
 function plotModel(skin_vector_vis)
     [N_vis, C_vis] = hist3(skin_vector_vis(:,1:2), [512,512]);
-    wx = C_vis{1}(:);
-    wy = C_vis{2}(:);
+    h_values = C_vis{1}(:) * 360;
+    s_values = C_vis{2}(:);
     figure(10)
-    H = pcolor(wx, wy, rescale(N_vis').^(1/3));
+    H = pcolor(h_values, s_values, rescale(N_vis').^(1/3));
     colormaps = load('../data/colormaps.mat');
     set(gca,'Color',colormaps.RdYlBu(1,:))
     box on
-    xlim([0 1])
+    xlim([0 360])
     ylim([0 1])
     axis square
     shading interp
