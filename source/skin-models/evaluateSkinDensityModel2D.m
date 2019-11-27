@@ -5,7 +5,6 @@ function [skin, skin_unlim] = evaluateSkinDensityModel2D(rgb)
     hsv = centerSkinHue(hsv);
     
     is_image = length(size(hsv)) == 3;
-    %global colormaps;
     
     if(is_image)
         h = hsv(:,:,1);
@@ -32,6 +31,7 @@ function [skin, skin_unlim] = evaluateSkinDensityModel2D(rgb)
         skin(value_mask) = 0;
         
         %skin_probability_image(value_mask) = 0;
+        %colormaps = load('../data/colormaps.mat');
         %imwrite(ind2rgb(im2uint8(skin_probability_image), colormaps.RdYlBu), '../data/skin-model/skin-density-image-vis.png');
         
     else

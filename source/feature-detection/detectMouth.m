@@ -15,6 +15,11 @@ function mouth = detectMouth(eyes, image)
     % eyes and then continue down along the orthogonal eye to mouth vector.
     mouth = eyes.left + L2R/2 + E2M;
     
+    if mouth(1) > size(image,2) || mouth(1) < 1 || mouth(2) > size(image,1) || mouth(2) < 1
+        mouth = [];
+        return;
+    end
+    
     % Create an ellipse mask at the initial mouth position
     width = size(image,2);
     height = size(image,1);
@@ -45,19 +50,20 @@ function mouth = detectMouth(eyes, image)
     
     mouth_map = mouthMap(image, mouth_ellipse);
     mouth_map(~mouth_ellipse) = 0;
-    % Flatten mouth map to reduce inter mouth variance
+    % Flatten mouth map to reduce variation
     mouth_map = rescale(mouth_map).^(1/3);
     
     mouth_mask = mouth_ellipse;
     
     prev_mouth_mask = [];
     
+    face_angle = -rad2deg(atan2(sin_a,cos_a));
+    SE = strel('line', 16, face_angle);
+    
     for i = 1:10
         mouth_mask = mouth_map > graythresh(mouth_map(mouth_mask));
-
+        
         % Close regions along the approximate mouth diagonal
-        face_angle = -rad2deg(atan2(sin_a,cos_a));
-        SE = strel('line', 16, face_angle);
         mouth_mask = imclose(mouth_mask, SE);
 
         % Close holes and keep only largest region
@@ -79,7 +85,6 @@ function mouth = detectMouth(eyes, image)
         
         % Break if mouth is aligned with face and if its is ellipse shaped 
         % enough. Almost always happens the first iteration.
-        disp([abs(mouth_S.Orientation - face_angle) , mouth_S.Eccentricity])
         if(abs(mouth_S.Orientation - face_angle) < 15 && mouth_S.Eccentricity > 0.4)
             mouth = mouth_S.WeightedCentroid(1,:);
             break;
@@ -89,6 +94,11 @@ function mouth = detectMouth(eyes, image)
             end
             prev_mouth_mask = mouth_mask;
         end
+    end
+    
+    if mouth(1) > size(image,2) || mouth(1) < 1 || mouth(2) > size(image,1) || mouth(2) < 1
+        mouth = [];
+        return;
     end
     
     debug_ = true;

@@ -1,3 +1,4 @@
 *.asv
 *.png
 *.psd
+!data/skin-model/representative_faces_samples_fill.png

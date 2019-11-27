@@ -1,3 +1,5 @@
+% Currently does nothing useful
+
 function database = createDatabase(rebuild)
     if ~rebuild && isfile('database.mat')
         database = load('database.mat').images;
@@ -10,7 +12,7 @@ function database = createDatabase(rebuild)
             
             image = im2double(image);
             image = whiteBalance(image);
-            image = autoExposure(image); % Really helps the skin model
+            image = autoExposure(image);
             
             images{id, 1} = image;
         end

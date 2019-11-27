@@ -1,3 +1,7 @@
+% Requires the 1999 faces caltech dataset from:
+% http://www.vision.caltech.edu/html-files/archive.html
+% The folder_path variable below should point to this.
+
 function face_tiles = createRepresentativeFaceTiles()
     representative = [1,2,10,12,23,31,37,38,42,45,49,51,58,59,70,73,75,80, ...
     90,94,99,105, 114,120,123,127,136,137,142,143,144,152,159,161,163,165, ...

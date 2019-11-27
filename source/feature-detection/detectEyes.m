@@ -28,6 +28,8 @@ function eyes = detectEyes(rgb_image, eye_mask)
         
         new_eye_mask = bwareaopen(new_eye_mask, 4^2, 4);
         
+        new_eye_mask = imopen(new_eye_mask, strel('disk', 5));
+        
         eye_CC = bwconncomp(new_eye_mask, 4);
         eye_labels = labelmatrix(eye_CC);
         eye_S = regionprops('table', eye_CC, eye_map, ...
@@ -51,7 +53,7 @@ function eyes = detectEyes(rgb_image, eye_mask)
                 eye_space_vecs(1,:) = normalizeProperty(eye_S.MeanIntensity);
                 eye_space_vecs(2,:) = 1.7*normalizeProperty(eye_S.Area);
                 eye_space_vecs(3,:) = 1.2*normalizeProperty(eye_S.MaxIntensity);
-                eye_space_vecs(4,:) = normalizeProperty(1 - eye_S.Eccentricity);
+                eye_space_vecs(4,:) = 2*normalizeProperty(1 - eye_S.Eccentricity);
                 eye_space_vecs(5,:) = normalizeProperty(1 - abs(eye_S.Circularity - 1));
                 
                 % Length of the eye space vector defines the eye-ness-ness 
@@ -188,7 +190,7 @@ function [eye_mask, initial_regions_found] = findInitialEyeRegions(eye_map, eye_
         pair_similarities = 1 - rescale(eye_space_dists);
         pair_masses = normalizeProperty(pair_masses);
 
-        pair_masses = pair_masses + 0.16 * pair_similarities;
+        pair_masses = pair_masses + 0.2 * pair_similarities;
 
         [~, eye_pair_idx] = max(pair_masses);
         eye_pair = eye_pairs(eye_pair_idx, :);

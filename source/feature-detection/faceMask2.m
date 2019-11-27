@@ -37,26 +37,6 @@ function [face_mask, quality] = faceMask2(skin, image, debug_)
     end
     
     candidates = candidates';
-    
-    if exist('debug_','var') && ~isempty(debug_) && debug_
-        candidates
-%         disp((S.EulerNumber < 1)')
-%         disp((abs(abs(S.Orientation) - 90) < 45 | abs(axis_ratio - 1) < 0.25)')
-%         disp((S.FilledArea > 15000)')
-%         disp((S.Eccentricity > 0.4 & S.Eccentricity < 0.92)')
-%         disp((S.Extent > 0.3)')
-%         disp((S.BoundingBox(:, 4) ./ S.BoundingBox(:, 3) < 2.25)')
-%         disp((S.FilledArea ./ S.Area > 1.01 )')
-        
-        disp((S.EulerNumber)')
-        disp((abs(abs(S.Orientation) - 90))')
-        disp(abs(axis_ratio - 1)')
-        disp((S.FilledArea)')
-        disp((S.Eccentricity)')
-        disp((S.Extent)')
-        disp((S.BoundingBox(:, 4) ./ S.BoundingBox(:, 3))')
-        disp((S.FilledArea ./ S.Area)')
-    end
 
     pairs = cell(1, max(candidates));
     BB = S.BoundingBox;
@@ -107,11 +87,6 @@ function [face_mask, quality] = faceMask2(skin, image, debug_)
         end
         perimeter_ratios{c} = perimeter_ratio;
         circularities{c} = C_S.Circularity;
-        
-        if exist('debug_','var') && ~isempty(debug_) && debug_
-            perimeter_ratios{c}
-            circularities{c}
-        end
     end
     
     candidates = setdiff(candidates, remove);
@@ -125,10 +100,7 @@ function [face_mask, quality] = faceMask2(skin, image, debug_)
     % Add back in any clipped pixels to fill in overexposed areas. These 
     % will be masked by the boundary of the remaining candidate regions 
     % as the new candidates.
-    %clipped = (rgb2gray(image) > 254/255);
-    %clipped = ((image(:,:,1) + image(:,:,2) + image(:,:,3)) / 3) > 254/255;
-    clipped = image > 254/255;
-    clipped = clipped(:,:,1) | clipped(:,:,2) | clipped(:,:,3);
+    clipped = rgb2gray(image) > 254/255;
     new_skin = clipped | orig_skin;
     new_skin = bwareaopen(new_skin, 400, 4);
     new_skin = bwareaopen(~new_skin, 100, 4);
@@ -153,10 +125,6 @@ function [face_mask, quality] = faceMask2(skin, image, debug_)
         extent = sum(crop_mask(:)) / numel(crop_mask);
         q = q + (3.1 * (1/0.3) * extent) ^ 2;
         
-        if exist('debug_','var') && ~isempty(debug_) && debug_
-            disp({'old' S.Extent(c) 'new' extent})
-        end
-        
         crop_mask = imclose(crop_mask, strel('disk', 6));
         hole_mask = imfill(crop_mask, 'holes') & ~crop_mask;
         
@@ -171,7 +139,6 @@ function [face_mask, quality] = faceMask2(skin, image, debug_)
         % mouth. This is verified by checking the minimum angle against the
         % expected minimum angle, which is the angle located at the mouth
         % in the face triangle.
-
         if(size(hole_stats,1) == 3)
             T = hole_stats.Centroid;
             Tt = T';
@@ -208,20 +175,8 @@ function [face_mask, quality] = faceMask2(skin, image, debug_)
             hole_area_limit = hole_area_ratio < 0.25;
             eye_dist_limit = eye_dist_ratio > 0.9;
             
-            if exist('debug_','var') && ~isempty(debug_) && debug_
-                disp({'eye_dist_ratio' eye_dist_ratio})
-                disp({'angle' min_angle_ratio})
-                disp({'triangle area' triangle_area_ratio})
-                disp({'center' center_ratio})
-                disp({'hole area' hole_area_ratio})
-            end
-            
             if triangle_area_limit && center_limit && min_angle_limit && hole_area_limit && eye_dist_limit
                 q = q + 30 * (min_angle_ratio + center_ratio);
-                if exist('debug_','var') && ~isempty(debug_) && debug_
-                    disp({'included'})
-                    rectangle('Position', [1, 1, size(hole_mask, 2) - 1, size(hole_mask, 1) - 1], 'LineWidth', 2, 'EdgeColor', 'g')
-                end
             end
         end
         
@@ -241,23 +196,6 @@ function [face_mask, quality] = faceMask2(skin, image, debug_)
     face_mask = boundary_mask & new_skin;
     
     if exist('debug_','var') && ~isempty(debug_) && debug_
-        boundary_mask_crop = ismember(L, [winner pairs{winner}]);
-        boundary_mask_crop = imcrop(boundary_mask_crop, S.BoundingBox(winner,:));
-        boundary_mask_crop = imfill(imclose(boundary_mask_crop, strel('disk', 32)), 'holes');
-        crop_mask = boundary_mask_crop & imcrop(new_skin, S.BoundingBox(winner,:));
-        
-        crop_mask = imclose(crop_mask, strel('disk', 6));
-        hole_mask = imfill(crop_mask, 'holes') & ~crop_mask;
-        
-        three_hole_mask = bwareafilt(hole_mask, 3);
-        
-        subplot(1,3,3)
-        imshow(three_hole_mask * 0.5 + hole_mask * 0.5)
-    end
-    
-    if exist('debug_','var') && ~isempty(debug_) && debug_
-        disp({'circularity' circularities{winner}})
-        subplot(1,3,2)
         debugPlot(candidates, pairs, winner_regions, skin, face_mask, S);
     end
 end
@@ -267,19 +205,19 @@ function debugPlot(candidates, pairs, winner_regions, skin, face_mask, S)
     runner_up_regions = setdiff(unique([candidates unique([ pairs{candidates} ])]), winner_regions);
     remaining_regions = setdiff(1:size(S,1), unique([candidates unique([ pairs{candidates} ])]));
     
-    imshow(face_mask); hold on;
+    imshow(face_mask * 0.5 + skin * 0.5); hold on;
     
     for region = winner_regions
+        rectangle('Position', S.BoundingBox(region, :), 'LineWidth', 2, 'EdgeColor', 'g')
+    end
+    
+    for region = runner_up_regions
         rectangle('Position', S.BoundingBox(region, :), 'LineWidth', 2, 'EdgeColor', 'b')
     end
     
-%     for region = runner_up_regions
-%         rectangle('Position', S.BoundingBox(region, :), 'LineWidth', 2, 'EdgeColor', 'g')
-%     end
-%     
-%     for region = remaining_regions
-%         rectangle('Position', S.BoundingBox(region, :), 'LineWidth', 2, 'EdgeColor', 'r')
-%     end
+    for region = remaining_regions
+        rectangle('Position', S.BoundingBox(region, :), 'LineWidth', 2, 'EdgeColor', 'r')
+    end
 
     hold off;
 end

@@ -5,8 +5,6 @@
 % being a skin color in the HSV color space.
 
 function SkinModel = createSkinDensityModel2D(rebuild)
-
-    %global colormaps;
     
     persistent SkinModel_;
     
@@ -29,17 +27,16 @@ function SkinModel = createSkinDensityModel2D(rebuild)
         % pixels from the tiled face image using the mask.
         rep_faces = rgb2hsv(rep_faces);
         skin_vector_hsv = reshape(rep_faces(rep_faces_mask), [], 3);
-        %skin_vector = reshape(rep_faces(rep_faces_mask), [], 3);
-        %skin_vector = im2double(skin_vector);
-        %skin_vector_hsv = rgb2hsv(skin_vector);
         skin_vector_hsv = centerSkinHue(skin_vector_hsv);
         skin_vector_vis = skin_vector_hsv;
         skin_vector_hsv = filterHS(skin_vector_hsv);
+        
+        if(true)
+            plotModel(skin_vector_vis);
+        end
     
         % Find the lower limit brightness value by finding the value 
         % above 1% of the outliers along Value dimension.
-        %v_low = computeLowV(skin_vector_hsv, 0.005);
-        %v_low = computeLowV(skin_vector_hsv, 0.003); %otsu
         v_low = computeLowV(skin_vector_hsv, 0.01);
         
         % Create the density grid
@@ -55,41 +52,16 @@ function SkinModel = createSkinDensityModel2D(rebuild)
         h_lim = [min(h_values()), max(h_values)];
         s_lim = [min(s_values()), max(s_values)];
         
+        %colormaps = load('../data/colormaps.mat');
         %skin_model_vis = im2uint8(imrotate(imresize(density, [512,512]), 90));
         %imwrite(ind2rgb(skin_model_vis, colormaps.RdYlBu), '../data/skin-model/skin-model-vis.png');
-        
-%         [N_vis, C_vis] = hist3(skin_vector_vis(:,1:2), [512,512]);
-%         wx = C_vis{1}(:);
-%         wy = C_vis{2}(:);
-%         figure(10)
-%         H = pcolor(wx, wy, rescale(N_vis').^(1/3));
-%         set(gca,'Color',colormaps.RdYlBu(1,:))
-%         box on
-%         xlim([-1 1])
-%         ylim([-1 1])
-%         axis square
-%         shading interp
-%         set(H,'edgecolor','none');
-%         colorbar
-%         colormap(colormaps.RdYlBu)
-%         xlabel('Hue (degrees)')
-%         ylabel('Saturation')
-        
-%         hist3(skin_vector_vis(:,1:2), [512,512],'CDataMode','auto','FaceColor','interp','LineStyle','none','FaceLighting','gouraud','AmbientStrength',0.8)
-%         colorbar
-%         colormap(colormaps.RdYlBu)
-%         light('Position',[0.75 0.75 400],'Style','local')
-%         axis square
         
         % Find a suitable density threshold value to use when a single
         % color value is being evaluated.
         [counts, values] = imhist(density, grid_size.^2);
         mass = rescale(cumsum(counts.*values));
         index = find(mass >= 0.685, 1, 'first');
-        single_color_threshold = values(index)
-        %single_color_threshold = graythresh(density);
-        
-        %disp(graythresh(density))
+        single_color_threshold = values(index);
 
         save('../data/skin-model/skin-model.mat', ...
             'density', ...
@@ -147,5 +119,31 @@ function result = filterHS(hsv)
     v(~keep) = [];
     
     result = [h,s,v];
+end
+
+function plotModel(skin_vector_vis)
+    [N_vis, C_vis] = hist3(skin_vector_vis(:,1:2), [512,512]);
+    wx = C_vis{1}(:);
+    wy = C_vis{2}(:);
+    figure(10)
+    H = pcolor(wx, wy, rescale(N_vis').^(1/3));
+    colormaps = load('../data/colormaps.mat');
+    set(gca,'Color',colormaps.RdYlBu(1,:))
+    box on
+    xlim([-1 1])
+    ylim([-1 1])
+    axis square
+    shading interp
+    set(H,'edgecolor','none');
+    colorbar
+    colormap(colormaps.RdYlBu)
+    xlabel('Hue (degrees)')
+    ylabel('Saturation')
+
+%     hist3(skin_vector_vis(:,1:2), [512,512],'CDataMode','auto','FaceColor','interp','LineStyle','none','FaceLighting','gouraud','AmbientStrength',0.8)
+%     colorbar
+%     colormap(colormaps.RdYlBu)
+%     light('Position',[0.75 0.75 400],'Style','local')
+%     axis square
 end
 

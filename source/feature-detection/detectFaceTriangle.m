@@ -1,110 +1,94 @@
-
-% Image should not be whitebalanced. The return image is the correctly
-% whitebalanced image.
 function [face_triangle, image] = detectFaceTriangle(image)
-    orig_image = image;
     
     face_triangle = struct;
-    
-    % PCA whitebalance and brightness limitation in skin model
-    image = whiteBalance(image, true, 'PCA');
-    skin = evaluateSkinDensityModel2D(image, true);
-    
-    [face_mask, found] = faceMask(skin);
-    
-    disp(['found: ' num2str(found)])
-    
-    % Invalid but large face mask tends to mean that the whitebalance and
-    % brightness limitation is correct but that there are skin colored
-    % background regions that have blended with the face. In these cases
-    % it's best to just continue and use the face mask, but without the 
-    % upper face ellipse masking later.
-    if ~found
-        face_mask_percentage = 100 * sum(face_mask(:)) / numel(face_mask);
-    end
-    min_face_mask_percentage = 10;
-    
-    if ~found && face_mask_percentage < min_face_mask_percentage
-        initial.image = image;
-        initial.skin = skin;
-        
-        % Gray World and brightness limitation in skin model
-        image = whiteBalance(orig_image, true, 'GW');
-        skin = evaluateSkinDensityModel2D(image, true);
-        [face_mask, found] = faceMask(skin);
-        
-        disp(['found: ' num2str(found)])
 
-        if ~found
+    pca_image = whiteBalance(image, false, 'PCA');
+    gw_image = whiteBalance(image, false, 'GW');
+    gc_image = whiteBalance(image, false, 'GC');
+
+    face_masks = cell(1,8);
+
+    [skin, skin_nolim] = evaluateSkinDensityModel2D(image);
+    [skin_pca, skin_nolim_pca] = evaluateSkinDensityModel2D(pca_image);
+    [skin_gw, skin_nolim_gw] = evaluateSkinDensityModel2D(gw_image);
+    [skin_gc, skin_nolim_gc] = evaluateSkinDensityModel2D(gc_image);
+
+    [face_masks{1}, quality(1)] = faceMask2(skin, image);
+    [face_masks{2}, quality(2)] = faceMask2(skin_pca, pca_image);
+    [face_masks{3}, quality(3)] = faceMask2(skin_gw, gw_image);
+    [face_masks{4}, quality(4)] = faceMask2(skin_gc, gc_image);
+
+    [q, idx] = max(quality);
+    if q < 7
+        [face_masks{5}, quality(5)] = faceMask2(skin_nolim, image);
+        [face_masks{6}, quality(6)] = faceMask2(skin_nolim_pca, pca_image);
+        [face_masks{7}, quality(7)] = faceMask2(skin_nolim_gw, gw_image);
+        [face_masks{8}, quality(8)] = faceMask2(skin_nolim_gc, gc_image);
             
-            % Gray World but no brightness limitation in skin model
-            skin = evaluateSkinDensityModel2D(image, false);
-            [face_mask, found] = faceMask(skin);
-            
-            disp(['found: ' num2str(found)])
-            
-            if ~found
-                % If all fails, stick with original method and ignore face
-                % mask.
-                image = initial.image;
-                skin = initial.skin;
-            end
+        q_before = q;
+        idx_before = idx;
+        [q, idx] = max(quality);
+        
+        if (q - q_before < 0.3)
+            q = q_before;
+            idx = idx_before;
+        end
+    end
+    
+    face_mask = face_masks{idx};
+    
+    if(q > 6.639)
+        switch idx
+            case 2, case 6
+                image = pca_image;
+            case 3, case 7
+                image = gw_image;
+            case 4, case 8
+                image = gc_image;
         end
         
-        % Face masks tends to be worse if it took this much to find one, so
-        % some additional dilation is done.
-        face_mask = imdilate(face_mask, strel('disk',16));
-    end
-    
-    % This is done to clean up non-skin regions before using it as an
-    % initial eye mask together with the face mask.
-    skin = bwareaopen(skin, 400, 4);
-    skin = imdilate(skin, strel('disk', 3));
-    
-    if found
-        
-        % If a good face mask is found, then we can limit the eye mask
-        % further by only including the upper part of the ellipse that
-        % encloses the face mask.
-        upper_face = ellipseUpperFaceRegion(face_mask);
-        eye_mask = upper_face & ~skin;
+        filled_face_mask = imfill(imclose(face_mask, strel('disk', 32)), 'holes');
+        filled_face_mask = imerode(filled_face_mask, strel('disk', 16));
+        filled_face_mask = bwareafilt(filled_face_mask, 1);
+        filled_upper_face = ellipseUpperFaceRegion(filled_face_mask);
+        eye_mask = filled_upper_face & ~face_mask;
         
     else
-        
-        if(face_mask_percentage > min_face_mask_percentage)
-            % Face mask returned early and therefore needs additional
-            % processing
-            face_mask = imclose(face_mask, strel('disk', 32));
-            face_mask = imfill(face_mask,'holes');
-            
-            eye_mask = face_mask & ~skin;
-        else
-            eye_mask = ~skin;
-        end
+        eye_mask = ~face_mask;
     end
+    
+    eye_mask = bwareaopen(eye_mask, 100, 4);
+    eye_mask = bwareaopen(~eye_mask, 100, 4);
+    eye_mask = ~eye_mask;
+    eye_mask = imclose(eye_mask, strel('disk', 2));
+    eye_mask = imerode(eye_mask, strel('disk', 4));
     
     eyes = detectEyes(image, eye_mask);
-    
-    % No valid eyes found in the resulting eye mask, try again with another
-    % approach as last resort.
-    if(isempty(fieldnames(eyes)))
-        eye_map = eyeMap(image);
-        skin = eye_map < graythresh(eye_map);
-        skin = bwareafilt(skin, 1, 4);
-        skin = imdilate(skin, strel('disk', 3));
-        face_mask = imfill(skin,'holes');
-        
-        eye_mask = face_mask & ~skin;
-        eyes = detectEyes(image, eye_mask);
-    end
-    
-    % Success
     if(~isempty(fieldnames(eyes)))
-        face_triangle.eyes = eyes;
         
-        % A mouth will always be detected. If it completely fails, then an
-        % approximation of the mouth position relative to the eyes is used.
-        face_triangle.mouth = detectMouth(eyes, image);
+        mouth = detectMouth(eyes, image);
+        if ~isempty(mouth)
+            face_triangle.mouth = mouth;
+            face_triangle.eyes = eyes;
+        else
+            % Completely different method as last resort
+            eye_map = eyeMap(image);
+            skin = eye_map < graythresh(eye_map);
+            skin = bwareafilt(skin, 1, 4);
+            skin = imdilate(skin, strel('disk', 3));
+            face_mask = imfill(skin,'holes');
+
+            eye_mask = face_mask & ~skin;
+            eyes = detectEyes(image, eye_mask);
+            
+            if(~isempty(fieldnames(eyes)))
+                mouth = detectMouth(eyes, image);
+                if ~isempty(mouth)
+                    face_triangle.eyes = eyes;
+                    face_triangle.mouth = mouth;
+                end
+            end
+        end
     end
 end
 
