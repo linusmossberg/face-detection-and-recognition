@@ -70,25 +70,26 @@ function [face_triangle, image] = detectFaceTriangle(image)
         if ~isempty(mouth)
             face_triangle.mouth = mouth;
             face_triangle.eyes = eyes;
-        else
-            % Completely different method as last resort
-            eye_map = eyeMap(image);
-            skin = eye_map < graythresh(eye_map);
-            skin = bwareafilt(skin, 1, 4);
-            skin = imdilate(skin, strel('disk', 3));
-            face_mask = imfill(skin,'holes');
-
-            eye_mask = face_mask & ~skin;
-            eyes = detectEyes(image, eye_mask);
-            
-            if(~isempty(fieldnames(eyes)))
-                mouth = detectMouth(eyes, image);
-                if ~isempty(mouth)
-                    face_triangle.eyes = eyes;
-                    face_triangle.mouth = mouth;
-                end
-            end
         end
+%         else
+%             % Completely different method as last resort
+%             eye_map = eyeMap(image);
+%             skin = eye_map < graythresh(eye_map);
+%             skin = bwareafilt(skin, 1, 4);
+%             skin = imdilate(skin, strel('disk', 3));
+%             face_mask = imfill(skin,'holes');
+% 
+%             eye_mask = face_mask & ~skin;
+%             eyes = detectEyes(image, eye_mask);
+%             
+%             if(~isempty(fieldnames(eyes)))
+%                 mouth = detectMouth(eyes, image);
+%                 if ~isempty(mouth)
+%                     face_triangle.eyes = eyes;
+%                     face_triangle.mouth = mouth;
+%                 end
+%             end
+%         end
     end
 end
 

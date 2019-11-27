@@ -5,13 +5,13 @@ addpath(genpath('feature-detection'));
 addpath(genpath('external'));
 
 % fix image_0244
-%image = imread('..\..\faces\image_0202.jpg');
-image = imread('..\data\DB2\ex_12.jpg');
+image = imread('..\..\faces\image_0205.jpg');
+%image = imread('..\data\DB2\ex_12.jpg');
 %image = imread('..\data\DB2\bl_04.jpg');
 %image = imread('..\data\DB2\cl_12.jpg');
 %image = imread('..\data\DB2\il_12.jpg');
-%image = imread('..\data\DB1\db1_03.jpg');
-%image = imread('..\data\DB0\db0_4.jpg');
+%image = imread('..\data\DB1\db1_12.jpg');
+%image = imread('..\data\DB0\db0_1.jpg');
 
 image = im2double(image);
 

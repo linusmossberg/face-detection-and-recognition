@@ -47,15 +47,18 @@ function eyes = detectEyes(image, eye_mask)
                 % dimension is defined in the range [0,1] but some more
                 % important properties are weighted higher.
                 
-                y_max = max(eye_S.WeightedCentroid(:,2));
-                y_min = min(eye_S.WeightedCentroid(:,2));
-                
                 eye_space_vecs = zeros(5, size(eye_S,1));
                 eye_space_vecs(1,:) = 2*normalizeProperty(eye_S.MeanIntensity .* eye_S.Area);
-                eye_space_vecs(2,:) = (eye_S.WeightedCentroid(:,2) - y_min) / (y_max - y_min);
-                eye_space_vecs(3,:) = 1.2*normalizeProperty(eye_S.MaxIntensity);
-                eye_space_vecs(4,:) = 2*normalizeProperty(1 - eye_S.Eccentricity);
-                eye_space_vecs(5,:) = normalizeProperty(1 - abs(eye_S.Circularity - 1));
+                eye_space_vecs(2,:) = 1.2*normalizeProperty(eye_S.MaxIntensity);
+                eye_space_vecs(3,:) = 2*normalizeProperty(1 - eye_S.Eccentricity);
+                eye_space_vecs(4,:) = normalizeProperty(1 - abs(eye_S.Circularity - 1));
+                
+                remaining_eyes = unique(eye_pairs(:))';
+                if(length(remaining_eyes) <= 4)
+                    y_max = max(eye_S.WeightedCentroid(remaining_eyes,2));
+                    y_min = min(eye_S.WeightedCentroid(remaining_eyes,2));
+                    eye_space_vecs(5,:) = (eye_S.WeightedCentroid(:,2) - y_min) / (y_max - y_min);
+                end
                 
                 % Length of the eye space vector defines the eye-ness-ness 
                 % of an eye.
@@ -177,6 +180,13 @@ function [eye_mask, initial_regions_found] = findInitialEyeRegions(eye_map, eye_
         eye_space_vecs(3,:) = 2 * normalizeProperty(eye_S.MaxIntensity);
         eye_space_vecs(4,:) = normalizeProperty(1 - eye_S.Eccentricity);
         eye_space_vecs(5,:) = 1.5*normalizeProperty(1 - abs(eye_S.Circularity - 1));
+        
+        remaining_eyes = unique(eye_pairs(:))';
+        if(length(remaining_eyes) <= 4)
+            y_max = max(eye_S.WeightedCentroid(remaining_eyes, 2));
+            y_min = min(eye_S.WeightedCentroid(remaining_eyes, 2));
+            eye_space_vecs(6,:) = 2*(eye_S.WeightedCentroid(:,2) - y_min) / (y_max - y_min);
+        end
         
         %eye_space_vecs(2,:) = 0;
             
