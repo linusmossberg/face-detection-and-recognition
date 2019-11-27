@@ -1,4 +1,4 @@
-function [face_mask, quality] = faceMask2(skin, image, debug_)
+function [face_mask, quality] = faceMask(skin, image, debug_)
         
     orig_skin = skin;
     

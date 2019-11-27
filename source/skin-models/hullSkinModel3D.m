@@ -1,11 +1,14 @@
+% Currently not really a function, just some experimentation with a
+% 3-dimensional skin model that uses a convex hull.
 
 function hullSkinModel3D()
-    rep_faces = imread('../data/skin-model/representative_faces.png');
-    rep_faces_mask = imread('../data/skin-model/representative_faces_samples4.png');
+    % Takes a really long time to create, better to save the tile image to
+    % disk and load it when experimenting.
+    rep_faces = createRepresentativeFaceTiles();
+    rep_faces_mask = imread('../data/skin-model/representative_faces_samples_fill.png');
     rep_faces_mask = rep_faces_mask == 255;
     
     skin_vector = reshape(rep_faces(rep_faces_mask), [], 3);
-    skin_vector = im2double(unique(skin_vector, 'rows'));
     skin_vector_ycbcr = rgb2ycbcr(skin_vector);
     %skin_vector_ycbcr = rgb2ycgcr(skin_vector);
     
@@ -19,8 +22,6 @@ function hullSkinModel3D()
     plotColorSpace(skin_vector_ycbcr, ycbcr2rgb(skin_vector_ycbcr)); hold on;
     trisurf(k,skin_vector_ycbcr(:,1),skin_vector_ycbcr(:,2),skin_vector_ycbcr(:,3), 'FaceAlpha', 0);
     
-    %image = imread('..\data\DB1\db1_16.jpg');
-    % 10
     image = imread('..\data\DB2\cl_10.jpg');
     image = im2double(image);
     image = whiteBalance(image);

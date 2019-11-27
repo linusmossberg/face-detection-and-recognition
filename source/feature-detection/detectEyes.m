@@ -1,8 +1,8 @@
 % Iterative otsu thresholding of eye map to find the eyes.
 
-function eyes = detectEyes(rgb_image, eye_mask)
+function eyes = detectEyes(image, eye_mask)
 
-    orig_eye_map = eyeMap(rgb_image);
+    orig_eye_map = eyeMap(image);
     
     eye_map = orig_eye_map .* eye_mask;
     eye_map = rescale(eye_map);
@@ -226,8 +226,6 @@ function eye_pairs = findEyePairs(eye_positions)
             sin_a = L2R_unit(2);
             
             orientation = -rad2deg(atan2(sin_a, cos_a));
-            
-            %orientation = abs(rad2deg(atan2(p2(2)-p1(2), (p2(1) - p1(1)))));
             
             valid_orient = abs(orientation) < max_angle;
             valid_dist = eye_dist > min_distance && eye_dist < max_distance;

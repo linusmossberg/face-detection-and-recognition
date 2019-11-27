@@ -13,16 +13,15 @@ image = imread('..\data\DB2\bl_04.jpg');
 %image = imread('..\data\DB1\db1_16.jpg');
 %image = imread('..\data\DB0\db0_4.jpg');
 
-%349
-
 image = im2double(image);
+
 figure(1)
 subplot(1,2,1)
 imshow(image)
-face_triangle = detectFaceTriangle(image);
-if(~isempty(fieldnames(face_triangle)))
+face = detectFace(image);
+if(~isempty(face))
     subplot(1,2,2)
-    imshow(transformFace(image, face_triangle));
+    imshow(face);
 end
 
 

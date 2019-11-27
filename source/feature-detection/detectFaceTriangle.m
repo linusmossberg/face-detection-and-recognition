@@ -13,17 +13,17 @@ function [face_triangle, image] = detectFaceTriangle(image)
     [skin_gw, skin_nolim_gw] = evaluateSkinDensityModel2D(gw_image);
     [skin_gc, skin_nolim_gc] = evaluateSkinDensityModel2D(gc_image);
 
-    [face_masks{1}, quality(1)] = faceMask2(skin, image);
-    [face_masks{2}, quality(2)] = faceMask2(skin_pca, pca_image);
-    [face_masks{3}, quality(3)] = faceMask2(skin_gw, gw_image);
-    [face_masks{4}, quality(4)] = faceMask2(skin_gc, gc_image);
+    [face_masks{1}, quality(1)] = faceMask(skin, image);
+    [face_masks{2}, quality(2)] = faceMask(skin_pca, pca_image);
+    [face_masks{3}, quality(3)] = faceMask(skin_gw, gw_image);
+    [face_masks{4}, quality(4)] = faceMask(skin_gc, gc_image);
 
     [q, idx] = max(quality);
     if q < 7
-        [face_masks{5}, quality(5)] = faceMask2(skin_nolim, image);
-        [face_masks{6}, quality(6)] = faceMask2(skin_nolim_pca, pca_image);
-        [face_masks{7}, quality(7)] = faceMask2(skin_nolim_gw, gw_image);
-        [face_masks{8}, quality(8)] = faceMask2(skin_nolim_gc, gc_image);
+        [face_masks{5}, quality(5)] = faceMask(skin_nolim, image);
+        [face_masks{6}, quality(6)] = faceMask(skin_nolim_pca, pca_image);
+        [face_masks{7}, quality(7)] = faceMask(skin_nolim_gw, gw_image);
+        [face_masks{8}, quality(8)] = faceMask(skin_nolim_gc, gc_image);
             
         q_before = q;
         idx_before = idx;

@@ -1,3 +1,7 @@
+% Returns 1 for skin and 0 otherwise. Input can be either an image or a
+% single rgb vector, in which case the output is either a mask or a single
+% logical value respectively.
+
 function [skin, skin_unlim] = evaluateSkinDensityModel2D(rgb)
 
     SM = createSkinDensityModel2D(false);

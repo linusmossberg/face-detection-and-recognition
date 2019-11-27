@@ -18,7 +18,6 @@ function SkinModel = createSkinDensityModel2D(rebuild)
         
         % Load the tiled image of faces and the mask that locates the skin
         % patches on them.
-        %rep_faces = imread('../data/skin-model/representative_faces.png');
         rep_faces = createRepresentativeFaceTiles();
         rep_faces_mask = imread('../data/skin-model/representative_faces_samples_fill.png');
         rep_faces_mask = rep_faces_mask == 255;
