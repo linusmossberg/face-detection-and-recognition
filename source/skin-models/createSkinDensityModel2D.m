@@ -129,8 +129,8 @@ function plotModel(skin_vector_vis)
     colormaps = load('../data/colormaps.mat');
     set(gca,'Color',colormaps.RdYlBu(1,:))
     box on
-    xlim([-1 1])
-    ylim([-1 1])
+    xlim([0 1])
+    ylim([0 1])
     axis square
     shading interp
     set(H,'edgecolor','none');
