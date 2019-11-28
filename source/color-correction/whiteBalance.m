@@ -29,7 +29,6 @@ function result = whiteBalance(image, omit_skin_model, type)
     end
     
     if(skin_illuminant)
-        disp('Skin illuminant');
         result = image;
     else
         result = chromadapt(image, illuminant);

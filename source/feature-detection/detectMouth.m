@@ -39,8 +39,8 @@ function mouth = detectMouth(eyes, image)
     
     % This gives a range of 3 sigma in ellipse height, which spans across 
     % 99.9% of mouth positions in the sampled data. (i.e. at least the 
-    % center of every mouth should be contained in the ellipse with this 
-    % value of b)
+    % center of 99.9% of mouths should be contained in the ellipse with 
+    % this value of b)
     b = (1.5 * sigma * eye_dist); 
     
     % Expand half of width to include the whole mouths.
@@ -50,6 +50,7 @@ function mouth = detectMouth(eyes, image)
     
     mouth_map = mouthMap(image, mouth_ellipse);
     mouth_map(~mouth_ellipse) = 0;
+    
     % Flatten mouth map to reduce variation
     mouth_map = rescale(mouth_map).^(1/3);
     
@@ -83,7 +84,7 @@ function mouth = detectMouth(eyes, image)
         
         if(isempty(mouth_S)), break; end
         
-        % Break if mouth is aligned with face and if its is ellipse shaped 
+        % Break if mouth is aligned with face and if it is ellipse shaped 
         % enough. Almost always happens the first iteration.
         if(abs(mouth_S.Orientation - face_angle) < 15 && mouth_S.Eccentricity > 0.4)
             mouth = mouth_S.WeightedCentroid(1,:);
@@ -101,7 +102,7 @@ function mouth = detectMouth(eyes, image)
         return;
     end
     
-    debug_ = true;
+    debug_ = false;
     
     if(exist('debug_','var') && debug_)
         %figure(1)

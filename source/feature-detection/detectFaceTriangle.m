@@ -36,14 +36,13 @@ function [face_triangle, image] = detectFaceTriangle(image)
     end
     
     face_mask = face_masks{idx};
-    
     if(q > 6.639)
         switch idx
-            case 2, case 6
+            case {2, 6}
                 image = pca_image;
-            case 3, case 7
+            case {3, 7}
                 image = gw_image;
-            case 4, case 8
+            case {4, 8}
                 image = gc_image;
         end
         

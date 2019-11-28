@@ -7,11 +7,11 @@ addpath(genpath('external'));
 % fix image_0244
 %image = imread('..\..\faces\image_0205.jpg');
 %image = imread('..\data\DB2\ex_12.jpg');
-%image = imread('..\data\DB2\bl_04.jpg');
+image = imread('..\data\DB2\bl_07.jpg');
 %image = imread('..\data\DB2\cl_12.jpg');
 %image = imread('..\data\DB2\il_07.jpg');
 %image = imread('..\data\DB1\db1_12.jpg');
-image = imread('..\data\DB0\db0_4.jpg');
+%image = imread('..\data\DB0\db0_3.jpg');
 
 image = im2double(image);
 
@@ -24,8 +24,8 @@ if(~isempty(face))
     imshow(face);
     hold on; 
     
-    x = [ 153.6000 358.4000 256.0000 ];
-    y = [ 212.6293 212.6293 439.4339 ];
+    x = [ 54.8571 201.1429 128.0000 ];
+    y = [ 70.8764 70.8764 232.8797 ];
     
     s = 0.5;
     
