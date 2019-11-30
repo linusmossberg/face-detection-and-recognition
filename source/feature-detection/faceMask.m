@@ -1,4 +1,4 @@
-function [face_mask, quality] = faceMask(skin, image, debug_)
+function [face_mask, quality] = faceMask(skin, image)
         
     orig_skin = skin;
     
@@ -195,7 +195,9 @@ function [face_mask, quality] = faceMask(skin, image, debug_)
     boundary_mask = imfill(imclose(face_mask, strel('disk', 32)), 'holes');
     face_mask = boundary_mask & new_skin;
     
-    if exist('debug_','var') && ~isempty(debug_) && debug_
+    debug_ = false;
+
+    if debug_
         debugPlot(candidates, pairs, winner_regions, skin, face_mask, S);
     end
 end

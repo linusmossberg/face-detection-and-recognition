@@ -1,8 +1,4 @@
-addpath(genpath('skin-models'));
-addpath(genpath('color-correction'));
-addpath(genpath('color-space'));
-addpath(genpath('feature-detection'));
-addpath(genpath('external'));
+addPaths();
 
 % fix image_0244
 %image = imread('..\..\faces\image_0205.jpg');

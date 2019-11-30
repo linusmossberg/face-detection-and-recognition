@@ -24,7 +24,7 @@ function hullSkinModel3D()
     
     image = imread('..\data\DB2\cl_10.jpg');
     image = im2double(image);
-    image = whiteBalance(image);
+    image = whiteBalance(image, false, 'PCA');
     image = rgb2ycbcr(image);
     
     image_vec = reshape(image, [], 3);

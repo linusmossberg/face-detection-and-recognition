@@ -104,7 +104,7 @@ function mouth = detectMouth(eyes, image)
     
     debug_ = false;
     
-    if(exist('debug_','var') && debug_)
+    if(debug_)
         %figure(1)
         debugPlot(mouth, eyes, image, mouth_ellipse, mouth_map);
     end

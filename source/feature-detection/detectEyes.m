@@ -121,7 +121,7 @@ function eyes = detectEyes(image, eye_mask)
             % trying to find and refine a smaller eye region within them. 
             if(initial_regions_found), break; end
             
-            if(flatten_process || all(eye_mask == new_eye_mask, 'all'))
+            if(flatten_process && all(eye_mask == new_eye_mask, 'all'))
                 break;
             end
             
@@ -157,7 +157,7 @@ end
 % except that no thresholding is done, the eye map is just used to compute
 % region properties. The eye regions in the mask is shaped more like the 
 % entire 'eye-silhouette' and is more elongated and elliptical, so there
-% might be reasons to redefine the eye property dimension here.
+% might be reasons to redefine the eye property space here.
 function [eye_mask, initial_regions_found] = findInitialEyeRegions(eye_map, eye_mask)
     eye_mask = bwareaopen(eye_mask, 4^2, 4);
     

@@ -1,15 +1,10 @@
 function id = tnm034(im)
     
-    addpath(genpath('skin-models'));
-    addpath(genpath('color-correction'));
-    addpath(genpath('color-space'));
-    addpath(genpath('feature-detection'));
-    addpath(genpath('recognition'));
-    addpath(genpath('external'));
+    addPaths();
 
     face = detectFace(im);
     if ~isempty(face)
-        id = recognizeFace(face);
+        id = recognizeFace(face, 'fisher');
     else
         id = 0;
     end

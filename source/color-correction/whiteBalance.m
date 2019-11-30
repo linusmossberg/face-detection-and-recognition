@@ -1,13 +1,5 @@
 
 function result = whiteBalance(image, omit_skin_model, type)
-
-    if(~exist('omit_skin_model','var') || isempty(omit_skin_model))
-        omit_skin_model = false;
-    end
-    
-    if(~exist('type','var') || isempty(type))
-        type = 'PCA';
-    end
     
     switch type
         case 'PCA'

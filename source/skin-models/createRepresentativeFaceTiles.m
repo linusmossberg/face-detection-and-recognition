@@ -38,7 +38,7 @@ function face_tiles = createRepresentativeFaceTiles()
         % probably could be baked into the skin model to detect skin in 
         % images taken with similar cameras (digital/film separation).
         omit_skin_model = true;
-        image = whiteBalance(image, omit_skin_model);
+        image = whiteBalance(image, omit_skin_model, 'PCA');
         image = imcrop(image, [min_c (max_c - min_c)]);
         
         %images{1, i} = im2uint16(image);
