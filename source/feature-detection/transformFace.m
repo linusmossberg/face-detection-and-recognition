@@ -2,7 +2,7 @@ function result = transformFace(image, face_triangle)
 
     [mu, ~] = faceStats();
     
-    eye_dist_to_width_ratio = 1.75;
+    eye_dist_to_width_ratio = 1.6;
     
     % Square aspect on average
     width = 256;
@@ -17,7 +17,7 @@ function result = transformFace(image, face_triangle)
     r_eye_x = l_eye_x + eye_dist;
     mouth_x = 0.5 * width;
     
-    eye_y = 0.25 * height;
+    eye_y = 0.21 * height;
     mouth_y = eye_y + eyeline_to_mouth_dist;
     
     % Points to fit face triangle points to

@@ -7,7 +7,7 @@ function addPaths()
         addpath(genpath('feature-detection'));
         addpath(genpath('recognition'));
         addpath(genpath('external'));
+        paths_added = true;
     end
-    paths_added = true;
 end
 

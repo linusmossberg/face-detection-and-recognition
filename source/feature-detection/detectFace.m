@@ -5,7 +5,7 @@ function result = detectFace(image)
     if ~isempty(fieldnames(face_triangle))
         result = transformFace(image, face_triangle);
         result = rgb2gray(result);
-        result = stretchGrayImage(result, 0.5);
+        result = stretchGrayImage(result, 0.475);
     else
         result = [];
     end
