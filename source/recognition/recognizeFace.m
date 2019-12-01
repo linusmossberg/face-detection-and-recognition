@@ -19,10 +19,9 @@ function [id, distance] = recognizeFace(face, type)
     % lot of false positives.
     eigen_threshold = 22.368;
     
-    % Based on the smallest distance for a few faces that are not in DB. 
-    % Could probably be a lot smaller, faces in DB tends to have a very 
-    % small distance of like 1e-14.
-    fisher_threshold = 32;
+    % Can be calculated with computeThreshold(). It's set to optimally
+    % minimize the sum of false positives and negatives.
+    fisher_threshold = 31.8280;
     
     if fisher
         if(distance < fisher_threshold)
