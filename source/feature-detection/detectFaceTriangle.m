@@ -49,18 +49,15 @@ function [face_triangle, image] = detectFaceTriangle(image)
         filled_face_mask = imfill(imclose(face_mask, strel('disk', 32)), 'holes');
         filled_face_mask = imerode(filled_face_mask, strel('disk', 16));
         filled_face_mask = bwareafilt(filled_face_mask, 1);
-        filled_upper_face = ellipseUpperFaceRegion(filled_face_mask);
-        eye_mask = filled_upper_face & ~face_mask;
-        
+        if ~all(idx ~= 1:4)
+            filled_upper_face = ellipseUpperFaceRegion(filled_face_mask);
+            eye_mask = filled_upper_face & ~face_mask;
+        else
+            eye_mask = filled_face_mask & ~face_mask;
+        end
     else
         eye_mask = ~face_mask;
     end
-    
-    eye_mask = bwareaopen(eye_mask, 100, 4);
-    eye_mask = bwareaopen(~eye_mask, 100, 4);
-    eye_mask = ~eye_mask;
-    eye_mask = imclose(eye_mask, strel('disk', 2));
-    eye_mask = imerode(eye_mask, strel('disk', 4));
     
     eyes = detectEyes(image, eye_mask);
     if(~isempty(fieldnames(eyes)))
@@ -86,6 +83,20 @@ function [face_triangle, image] = detectFaceTriangle(image)
                     face_triangle.eyes = eyes;
                     face_triangle.mouth = mouth;
                 end
+            end
+        end
+    else
+        % Face mask likely only covers part of face and eyes are not closed
+        % holes, use the convex hull of the face mask as the new face mask.
+        convex_face_mask = bwconvhull(face_mask);
+        convex_face_mask = imerode(convex_face_mask, strel('disk', 24));
+        eye_mask = convex_face_mask & ~face_mask;
+        eyes = detectEyes(image, eye_mask);
+        if(~isempty(fieldnames(eyes)))
+            mouth = detectMouth(eyes, image);
+            if ~isempty(mouth)
+                face_triangle.eyes = eyes;
+                face_triangle.mouth = mouth;
             end
         end
     end

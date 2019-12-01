@@ -1,11 +1,11 @@
 function id = tnm034(im)
     
-    addPaths();
-
+    initiate();
+    
+    id = 0;
+    
     face = detectFace(im);
     if ~isempty(face)
         id = recognizeFace(face, 'fisher');
-    else
-        id = 0;
     end
 end

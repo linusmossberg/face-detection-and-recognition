@@ -2,6 +2,12 @@
 
 function eyes = detectEyes(image, eye_mask)
 
+    eye_mask = bwareaopen(eye_mask, 100, 4);
+    eye_mask = bwareaopen(~eye_mask, 100, 4);
+    eye_mask = ~eye_mask;
+    eye_mask = imclose(eye_mask, strel('disk', 2));
+    eye_mask = imerode(eye_mask, strel('disk', 4));
+
     orig_eye_map = eyeMap(image);
     
     eye_map = orig_eye_map .* eye_mask;

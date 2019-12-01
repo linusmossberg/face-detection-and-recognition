@@ -1,13 +1,14 @@
 addPaths();
 
 % fix image_0244
-%image = imread('..\..\faces\image_0205.jpg');
+%image = imread('..\..\faces\image_0021.jpg');
+image = imread('..\..\faces\image_0244.jpg');
 %image = imread('..\data\DB2\ex_12.jpg');
-image = imread('..\data\DB2\bl_07.jpg');
-%image = imread('..\data\DB2\cl_12.jpg');
+%image = imread('..\data\DB2\bl_07.jpg');
+%image = imread('..\data\DB2\cl_07.jpg');
 %image = imread('..\data\DB2\il_07.jpg');
 %image = imread('..\data\DB1\db1_12.jpg');
-%image = imread('..\data\DB0\db0_3.jpg');
+%image = imread('..\data\DB0\db0_2.jpg');
 
 image = im2double(image);
 
@@ -20,8 +21,8 @@ if(~isempty(face))
     imshow(face);
     hold on; 
     
-    x = [ 54.8571 201.1429 128.0000 ];
-    y = [ 70.8764 70.8764 232.8797 ];
+    x = [ 48.0000, 208.0000, 128.0000 ];
+    y = [ 59.5362, 59.5362, 236.7273 ];
     
     s = 0.5;
     
