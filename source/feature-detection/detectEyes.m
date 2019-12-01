@@ -63,7 +63,9 @@ function eyes = detectEyes(image, eye_mask)
                 if(length(remaining_eyes) <= 4)
                     y_max = max(eye_S.WeightedCentroid(remaining_eyes,2));
                     y_min = min(eye_S.WeightedCentroid(remaining_eyes,2));
-                    eye_space_vecs(5,:) = (eye_S.WeightedCentroid(:,2) - y_min) / (y_max - y_min);
+                    if(y_max - y_min < 50)
+                        eye_space_vecs(5,:) = (eye_S.WeightedCentroid(:,2) - y_min) / (y_max - y_min);
+                    end
                 end
                 
                 % Length of the eye space vector defines the eye-ness-ness 
@@ -191,7 +193,9 @@ function [eye_mask, initial_regions_found] = findInitialEyeRegions(eye_map, eye_
         if(length(remaining_eyes) <= 4)
             y_max = max(eye_S.WeightedCentroid(remaining_eyes, 2));
             y_min = min(eye_S.WeightedCentroid(remaining_eyes, 2));
-            eye_space_vecs(6,:) = 2*(eye_S.WeightedCentroid(:,2) - y_min) / (y_max - y_min);
+            if(y_max - y_min < 50)
+                eye_space_vecs(6,:) = 2*(eye_S.WeightedCentroid(:,2) - y_min) / (y_max - y_min);
+            end
         end
         
         %eye_space_vecs(2,:) = 0;

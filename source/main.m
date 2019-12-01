@@ -1,8 +1,8 @@
-addPaths();
+initiate();
 
 % fix image_0244
 %image = imread('..\..\faces\image_0021.jpg');
-image = imread('..\..\faces\image_0244.jpg');
+image = imread('..\..\faces\image_0010.jpg');
 %image = imread('..\data\DB2\ex_12.jpg');
 %image = imread('..\data\DB2\bl_07.jpg');
 %image = imread('..\data\DB2\cl_07.jpg');

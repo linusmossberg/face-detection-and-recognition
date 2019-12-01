@@ -79,7 +79,7 @@ function mouth = detectMouth(eyes, image)
 
         % Find properties of the resulting region
         mouth_CC = bwconncomp(mouth_mask);
-        mouth_S = regionprops('table', mouth_CC, mouth_map,'WeightedCentroid', ...
+        mouth_S = regionprops('table', mouth_CC, 'Centroid', ...
                               'Orientation', 'Eccentricity', 'Area');
         
         if(isempty(mouth_S)), break; end
@@ -87,7 +87,7 @@ function mouth = detectMouth(eyes, image)
         % Break if mouth is aligned with face and if it is ellipse shaped 
         % enough. Almost always happens the first iteration.
         if(abs(mouth_S.Orientation - face_angle) < 15 && mouth_S.Eccentricity > 0.4)
-            mouth = mouth_S.WeightedCentroid(1,:);
+            mouth = mouth_S.Centroid(1,:);
             break;
         else
             if (mouth_S.Area < 250) || (i ~= 1 && all(mouth_mask == prev_mouth_mask, 'all'))

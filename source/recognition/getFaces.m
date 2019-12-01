@@ -24,6 +24,19 @@ function [faces, ids] = getFaces()
         end
     end
     
+%     additional_faces = [65 140 155 240 274 362 406];
+%     
+%     for image_num = additional_faces
+%         id = getId(image_num);
+%         image = imread(['../../faces/image_' num2str(image_num, '%04d') '.jpg']);
+%         face = detectFace(image);
+%         if(~isempty(face))
+%             faces(:,:,i) = detectFace(image);
+%             ids(i) = id;
+%             i = i + 1;
+%         end
+%     end
+    
     faces_ = faces;
     ids_ = ids;
 end
