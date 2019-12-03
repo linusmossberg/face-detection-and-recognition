@@ -11,7 +11,7 @@ function fisherfaces = fisherfaces(rebuild)
     fisherfaces_path = '../data/recognition/fisherfaces.mat';
 
     if rebuild || ~isfile(fisherfaces_path)
-        [faces, ids] = getFaces();
+        [faces, ids] = getTrainingFaces('fisher');
         width = size(faces,2);
         num_ids = max(ids); % c
         num_samples = size(faces, 3); % N

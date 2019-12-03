@@ -11,7 +11,7 @@ function eigenfaces = eigenfaces(rebuild)
     eigenfaces_path = '../data/recognition/eigenfaces.mat';
 
     if rebuild || ~isfile(eigenfaces_path)
-        [faces, ids] = getFaces();
+        [faces, ids] = getTrainingFaces('eigen');
         width = size(faces,2);
         
         face_vecs = reshape(faces, [], size(faces,3));
@@ -22,7 +22,7 @@ function eigenfaces = eigenfaces(rebuild)
         
         eigen_vectors = transpose(eigen_vectors);
         
-        weights = eigen_vectors * face_vecs;
+        weights = eigen_vectors * bsxfun(@minus, face_vecs, mean_face_vec);
         
         save(eigenfaces_path, 'eigen_vectors', 'weights', 'mean_face_vec', 'ids', 'width');
     end
