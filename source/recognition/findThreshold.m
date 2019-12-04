@@ -1,4 +1,7 @@
-% Some experimenting with finding good distance thresholds. 
+% Different graphs and calculations that can help with finding good
+% distance threshold values. The minimum of the 'errors' vector is probably
+% the best as this optimally reduces the sum of false positives and
+% negatives on the caltech dataset.
 
 type = 'fisher';
 

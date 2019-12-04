@@ -33,6 +33,8 @@ function result = normalizeFace(image, face_triangle, type)
                    face_triangle.eyes.right ];
                
     if ~strcmp(type, 'eigen')
+        % Results in just uniform scaling and rotation. This works better 
+        % for fisherfaces, even though it means that mouths are not aligned.
         A(3,1:2) = avgMouth(face_triangle.eyes, mu);
     else
         A(3,1:2) = face_triangle.mouth;

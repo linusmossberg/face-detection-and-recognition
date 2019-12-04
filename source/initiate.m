@@ -5,7 +5,7 @@ function initiate()
         addpath(genpath('skin-models'));
         addpath(genpath('color-correction'));
         addpath(genpath('color-space'));
-        addpath(genpath('feature-detection'));
+        addpath(genpath('detection'));
         addpath(genpath('recognition'));
         addpath(genpath('external'));
         initiated = true;

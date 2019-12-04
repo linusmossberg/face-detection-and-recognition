@@ -19,6 +19,5 @@ function visualizeModel(model, num_principal)
         image = ind2rgb(im2uint8(rescale(image)), gray);
         imshow(image, 'Interpolation', 'bilinear');
     end
-    
 end
 
