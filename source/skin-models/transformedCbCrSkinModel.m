@@ -38,10 +38,8 @@ function skin = transformedCbCrSkinModel(rgb)
     Cy = 152.02;
     theta = 2.53;
     ECx = 1.6;
-    %ECx = -1;
     ECy = 2.31;
     a = 25.39;
-    %a = 30;
     b = 14.03;
     
     x =  cos(theta) * (Cb_new - Cx) + sin(theta) * (Cr_new - Cy);

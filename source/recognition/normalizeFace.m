@@ -1,5 +1,4 @@
 function result = normalizeFace(image, face_triangle, type)
-    fisher = ~strcmp(type, 'eigen');
 
     [mu, ~] = faceStats();
     
@@ -33,7 +32,7 @@ function result = normalizeFace(image, face_triangle, type)
     A(1:2,1:2) = [ face_triangle.eyes.left ;
                    face_triangle.eyes.right ];
                
-    if fisher
+    if ~strcmp(type, 'eigen')
         A(3,1:2) = avgMouth(face_triangle.eyes, mu);
     else
         A(3,1:2) = face_triangle.mouth;

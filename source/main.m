@@ -1,18 +1,6 @@
 initiate();
 
-% fix image_0244
-%image = imread('..\..\faces\image_0021.jpg');
-%image = imread('..\..\faces\image_0010.jpg');
-%image = imread('..\data\DB2\ex_12.jpg');
-%image = imread('..\data\DB2\bl_07.jpg');
-%image = imread('..\data\DB2\cl_07.jpg');
-%image = imread('..\data\DB2\il_07.jpg');
-%image = imread('..\data\DB1\db1_12.jpg');
-%image = imread('..\data\DB0\db0_2.jpg');
-
-faces_path = '../../faces/';
-
-image_files = dir([faces_path, '*.jpg']);
+image_files = dir('../data/faces/*.jpg');
 for image_file = image_files'
     image = im2double(imread([image_file.folder '\' image_file.name]));
     figure(1)

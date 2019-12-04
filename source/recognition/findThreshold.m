@@ -6,7 +6,7 @@ if ~exist('faces', 'var')
     faces = [];
 end
 
-image_files = dir(['../../faces/', '*.jpg']);
+image_files = dir('../data/faces/*.jpg');
 
 if isempty(faces)
     num = 1;

@@ -9,7 +9,7 @@ function face_tiles = createRepresentativeFaceTiles()
     250,252,262,270,272,274,276,307,310,314,319,324,337,338,344,353,357,359, ...
     360,364,377,381,387,391,401,406,407,408,413,417,419,420,431,436,440,445];
     
-    folder_path = '../../faces/';
+    folder_path = '../data/faces/';
     face_coords = load([folder_path 'ImageData.mat']).SubDir_Data;
     images = {};
     i = 1;
@@ -54,7 +54,7 @@ end
 % it tends to pick images of some people more than others, probably because
 % they were taken under better conditions.
 function createRepresentativeFaceTilesOld()
-    folder_path = '../../faces/';
+    folder_path = '../data/faces/';
     face_coords = load([folder_path 'ImageData.mat']).SubDir_Data;
     image_files = dir([folder_path, '*.jpg']);
     images = {};

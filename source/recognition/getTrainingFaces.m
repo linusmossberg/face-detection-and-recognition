@@ -12,7 +12,7 @@ function [faces, ids] = getTrainingFaces(type)
     i = 1;
     for image_num = [DB1 DB2 additional]
         id = getId(image_num);
-        image = imread(['../../faces/image_' num2str(image_num, '%04d') '.jpg']);
+        image = imread(['../data/faces/image_' num2str(image_num, '%04d') '.jpg']);
         [face_triangle, image] = detectFace(image);
         if(~isempty(fieldnames(face_triangle)))
             faces(:,:,i) = normalizeFace(image, face_triangle, type);
