@@ -6,7 +6,7 @@ The models are trained with 72 images of 16 people that have been assigned diffe
 ## Accuracy
 Of the remaining 378 images, the program is able to correctly detect and recognize 98.67% of the faces using the fisherfaces model, either with the ID corresponding to the person or 0 if the person is unknown. This could be increased to about 99.2% with more training images, but no more since the detection fails in three extremely underexposed images. The eigenfaces model only correctly recognizes 91.01% of the faces, despite using 4.5x more principal components than the fisherfaces model.
 
-The training images are not included in these numbers as these are guaranteed to be recognized correctly Both of these are with distance thresholds that optimally reduces the sum of false positives and negatives.
+The training images are not included in these numbers as these are guaranteed to be recognized correctly. Both of these have distance thresholds set to optimally reduce the sum of false positives and negatives.
 
 | Model       | Accuracy |
 | ----------- | -------- |
