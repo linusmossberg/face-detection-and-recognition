@@ -4,7 +4,7 @@ function [id, distance] = detectAndRecognize(image, type)
     distance = -1;
     [face_triangle, image_wb] = detectFace(image);
     if(~isempty(fieldnames(face_triangle)))
-        face = normalizeFace(image_wb, face_triangle, type);
+        face = normalizeFace(face_triangle, image_wb, type);
         [id, distance] = recognizeFace(face, type);
     end
 end

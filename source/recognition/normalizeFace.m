@@ -1,4 +1,4 @@
-function result = normalizeFace(image, face_triangle, type)
+function result = normalizeFace(face_triangle, image, type)
 
     [mu, ~] = faceStats();
     

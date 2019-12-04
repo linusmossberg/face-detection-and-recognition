@@ -2,18 +2,19 @@ initiate();
 
 image_files = dir('../data/faces/*.jpg');
 for image_file = image_files'
-    image = im2double(imread([image_file.folder '\' image_file.name]));
+    image = imread([image_file.folder '\' image_file.name]);
     figure(1)
     subplot(1,2,1)
     imshow(image)
-    face = detectFace(image);
+    [face_triangle, image] = detectFace(image);
+    face = normalizeFace(face_triangle, image, 'eigen');
     if(~isempty(face))
         subplot(1,2,2)
         imshow(face);
         hold on; 
 
-        x = [ 48.0000, 208.0000, 128.0000 ];
-        y = [ 59.5362, 59.5362, 236.7273 ];
+        x = [ 49.2308 206.7692 128.0000 ];
+        y = [ 62.3713 62.3713 236.8363 ];
 
         s = 0.5;
 

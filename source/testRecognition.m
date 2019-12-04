@@ -10,7 +10,7 @@ for image_file = image_files'
         matched = matched + 1;
         disp([image_file.name ', correctly matched id: ' num2str(matched_id)])
     else
-        disp([image_file.name ', matched id: ' num2str(matched_id)])
+        disp([image_file.name ', incorrectly matched id: ' num2str(matched_id)])
     end
 end
 
