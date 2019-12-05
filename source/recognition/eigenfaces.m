@@ -1,5 +1,9 @@
 
 function eigenfaces = eigenfaces(rebuild)
+
+    if nargin == 0
+        rebuild = false;
+    end
     
     persistent eigenfaces_;
     

@@ -8,6 +8,7 @@ function initiate()
         addpath(genpath('detection'));
         addpath(genpath('recognition'));
         addpath(genpath('external'));
+        addpath(genpath('util'));
         initiated = true;
     end
 end

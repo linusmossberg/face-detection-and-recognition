@@ -4,7 +4,7 @@
 
 function [skin, skin_unlim] = evaluateSkinDensityModel2D(rgb)
 
-    SM = createSkinDensityModel2D(false);
+    SM = createSkinDensityModel2D();
     hsv = rgb2hsv(rgb);
     hsv = centerSkinHue(hsv);
     

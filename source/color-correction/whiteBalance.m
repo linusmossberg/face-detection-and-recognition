@@ -2,9 +2,6 @@
 function result = whiteBalance(image, omit_skin_model, type)
     
     switch type
-        case 'PCA'
-            illuminant = illumpca(rgb2lin(image));
-            illuminant = lin2rgb(illuminant);
         case 'GW'
             illuminant = illumgray(rgb2lin(image), 10, 'Mask', ~getClipped(image));
             illuminant = lin2rgb(illuminant);
@@ -17,7 +14,7 @@ function result = whiteBalance(image, omit_skin_model, type)
     
     skin_illuminant = false;
     if(~omit_skin_model)
-        skin_illuminant = evaluateSkinDensityModel2D(illuminant);  
+        skin_illuminant = evaluateSkinDensityModel2D(illuminant);
     end
     
     if(skin_illuminant)

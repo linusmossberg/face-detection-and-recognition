@@ -1,20 +1,23 @@
+% The returned image is whitebalanced based on the method that produced the
+% best face mask.
+
 function [face_triangle, image] = detectFace(image)
 
     image = im2double(image);
     
     face_triangle = struct;
-
+    
     pca_image = whiteBalance(image, false, 'PCA');
-    gw_image = whiteBalance(image, false, 'GW');
-    gc_image = whiteBalance(image, false, 'GC');
+    gw_image  = whiteBalance(image, false, 'GW');
+    gc_image  = whiteBalance(image, false, 'GC');
 
     face_masks = cell(1,8);
-
-    [skin, skin_nolim] = evaluateSkinDensityModel2D(image);
+    
+    [skin, skin_nolim]         = evaluateSkinDensityModel2D(image);
     [skin_pca, skin_nolim_pca] = evaluateSkinDensityModel2D(pca_image);
-    [skin_gw, skin_nolim_gw] = evaluateSkinDensityModel2D(gw_image);
-    [skin_gc, skin_nolim_gc] = evaluateSkinDensityModel2D(gc_image);
-
+    [skin_gw, skin_nolim_gw]   = evaluateSkinDensityModel2D(gw_image);
+    [skin_gc, skin_nolim_gc]   = evaluateSkinDensityModel2D(gc_image);
+    
     [face_masks{1}, quality(1)] = faceMask(skin, image);
     [face_masks{2}, quality(2)] = faceMask(skin_pca, pca_image);
     [face_masks{3}, quality(3)] = faceMask(skin_gw, gw_image);

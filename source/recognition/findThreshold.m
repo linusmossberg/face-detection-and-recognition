@@ -16,7 +16,7 @@ if isempty(faces)
     for image_file = image_files'
         [face_triangle, image] = detectFace(imread([image_file.folder, '\', image_file.name]));
         if(~isempty(fieldnames(face_triangle)))
-            faces(:,:,num) = normalizeFace(image, face_triangle, type);
+            faces(:,:,num) = normalizeFace(face_triangle, image, type);
             image_num = str2num(extractBefore(extractAfter(image_file.name, '_'), '.'));
             ids(num) = getId(image_num);
             num = num + 1;

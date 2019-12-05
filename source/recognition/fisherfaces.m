@@ -1,5 +1,9 @@
 
 function fisherfaces = fisherfaces(rebuild)
+    
+    if nargin == 0
+        rebuild = false;
+    end
 
     persistent fisherfaces_;
     

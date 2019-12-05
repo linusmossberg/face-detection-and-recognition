@@ -1,5 +1,6 @@
 % Currently not really a function, just some experimentation with a
-% 3-dimensional skin model that uses a convex hull.
+% 3-dimensional skin model that uses a convex hull to enclose skin regions 
+% in the color space.
 
 function hullSkinModel3D()
     % Takes a really long time to create, better to save the tile image to
@@ -22,7 +23,7 @@ function hullSkinModel3D()
     plotColorSpace(skin_vector_ycbcr, ycbcr2rgb(skin_vector_ycbcr)); hold on;
     trisurf(k,skin_vector_ycbcr(:,1),skin_vector_ycbcr(:,2),skin_vector_ycbcr(:,3), 'FaceAlpha', 0);
     
-    image = imread('..\data\DB2\cl_10.jpg');
+    image = imread('..\data\faces\image_0259.jpg');
     image = im2double(image);
     image = whiteBalance(image, false, 'PCA');
     image = rgb2ycbcr(image);

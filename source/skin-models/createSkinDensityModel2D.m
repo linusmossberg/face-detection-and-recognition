@@ -6,6 +6,10 @@
 
 function SkinModel = createSkinDensityModel2D(rebuild)
     
+    if nargin == 0
+        rebuild = false;
+    end
+
     persistent SkinModel_;
     
     % Don't recompute if SkinModel_ already has been computed/loaded.

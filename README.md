@@ -4,14 +4,14 @@ Face Detection and Recognition program developed in Matlab for the course *TNM03
 The models are trained with 72 images of 16 people that have been assigned different ID-numbers. The remaining people are unknown and the program should recognize them as such and return an ID of 0. 
 
 ## Accuracy
-Of the remaining 378 images, the program is able to correctly detect and recognize 98.67% of the faces using the fisherfaces model, either with the ID corresponding to the person or 0 if the person is unknown. This could be increased to about 99.2% with more training images, but no more since the detection fails in three extremely underexposed images. The eigenfaces model only correctly recognizes 91.01% of the faces, despite using 4.5x more principal components than the fisherfaces model.
+Of the remaining 378 images, the program is able to correctly detect and recognize 98.68% of the faces using the fisherfaces model, either with the ID corresponding to the person or 0 if the person is unknown. This could be increased to about 99.2% with more training images, but no more since the detection fails in three extremely underexposed images. The eigenfaces model only correctly recognizes 91.01% of the faces, despite using 4.5x more principal components than the fisherfaces model.
 
-The training images are not included in these numbers as these are guaranteed to be recognized correctly. Both of these have distance thresholds set to optimally reduce the sum of false positives and negatives.
+| Model       | Accuracy | False Negatives | False Positives |
+| ----------- | -------- | --------------- | --------------- |
+| Fisherfaces | 98.68%   | 1.32%           | 0.00%           |
+| Eigenfaces  | 91.01%   | 8.20%           | 0.79%           |
 
-| Model       | Accuracy |
-| ----------- | -------- |
-| Fisherfaces | 98.67%   |
-| Eigenfaces  | 91.01%   |
+The training images are not included in these numbers as these are guaranteed to be recognized correctly. Both of the models have distance thresholds set to optimally reduce the sum of false positives and negatives.
 
 ## Requirements
 The following products are required to run the program:

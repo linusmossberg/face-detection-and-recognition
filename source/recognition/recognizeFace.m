@@ -4,10 +4,10 @@ function [id, distance] = recognizeFace(face, type)
     
     if ~strcmp(type, 'eigen')
         threshold = 24;
-        M = fisherfaces(false);
+        M = fisherfaces();
     else
         threshold = 21.82;
-        M = eigenfaces(false);
+        M = eigenfaces();
         face_vec = face_vec - M.mean_face_vec;
     end
     

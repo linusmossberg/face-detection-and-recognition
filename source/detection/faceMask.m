@@ -22,6 +22,7 @@ function [face_mask, quality] = faceMask(skin, image)
                 
     axis_ratio = S.MajorAxisLength ./ S.MinorAxisLength;
     
+    % Find possible face candidates based on region properties
     candidates = find(S.EulerNumber < 1);
     candidates = intersect(candidates, find(abs(abs(S.Orientation) - 90) < 45 | abs(axis_ratio - 1) < 0.25));
     candidates = intersect(candidates, find(S.FilledArea > 15000));
@@ -41,6 +42,7 @@ function [face_mask, quality] = faceMask(skin, image)
     pairs = cell(1, max(candidates));
     BB = S.BoundingBox;
     
+    % Pair certain non-candidate regions with candidates
     for c = candidates
         for region = 1:size(S,1)
             if(c == region)
@@ -61,6 +63,11 @@ function [face_mask, quality] = faceMask(skin, image)
         end
     end
     
+    % Find the circularity and perimeter ratio of resulting candidate
+    % regions with paired regions. The perimeter ratio is the ratio between
+    % the perimeter of the ellipse encompassing the region and the
+    % perimeter of the actual region. The idea is that these probably
+    % should match eachother closely if the region is a face.
     perimeter_ratios = cell(1, max(candidates));
     circularities = cell(1, max(candidates));
     remove = zeros(length(candidates),1); num = 0;
@@ -106,6 +113,8 @@ function [face_mask, quality] = faceMask(skin, image)
     new_skin = bwareaopen(~new_skin, 100, 4);
     new_skin = ~new_skin;
     
+    % Create a quality measure for the remaining face candidates based on 
+    % several region properties
     candidates_quality = cell(1, max(candidates));
     for c = candidates
         
@@ -128,8 +137,10 @@ function [face_mask, quality] = faceMask(skin, image)
         crop_mask = imclose(crop_mask, strel('disk', 6));
         hole_mask = imfill(crop_mask, 'holes') & ~crop_mask;
         
+        % Ratio between the area of the holes in the region and the area of
+        % the region. This ratio should be small for a good face mask since
+        % the holes only should constitute eyes and mouth.
         hole_area_ratio = sum(hole_mask(:)) / sum(crop_mask(:));
-        
         q = q - (10 * hole_area_ratio) ^ 2;
         
         hole_mask = bwareafilt(hole_mask, 3);
@@ -152,10 +163,12 @@ function [face_mask, quality] = faceMask(skin, image)
             
             T_pos = [mean(Tt(1,:)), mean(Tt(2,:))];
             center = [size(hole_mask,2), size(hole_mask,1)] / 2;
-           
+            
             triangle_area_ratio = polyarea(Tt(1,:), Tt(2,:)) / numel(hole_mask);
             center_ratio = 1 - pdist([ T_pos ; center ]) / (max(size(hole_mask)) / 2);
             
+            % Ratio between distance from the mouth to both of the eyes. 
+            % These distances should be close to equal.
             eye_dist_ratio = sqrt(sum(v1.^2)) / sqrt(sum(v2.^2));
             if eye_dist_ratio > 1, eye_dist_ratio = 1/eye_dist_ratio; end
             
@@ -187,6 +200,9 @@ function [face_mask, quality] = faceMask(skin, image)
         end
     end
     
+    % Pick the face region with the highest quality. This could easily be 
+    % extended to detect multiple faces by keeping faces over a certain 
+    % quality threshold.
     [quality, c_idx] = max([candidates_quality{candidates}]);
     winner = candidates(c_idx);
     winner_regions = [winner pairs{winner}];
