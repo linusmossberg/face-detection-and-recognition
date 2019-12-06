@@ -20,9 +20,11 @@ function eigenfaces = eigenfaces(rebuild)
         
         face_vecs = reshape(faces, [], size(faces,3));
         
-        % Remove the 3 most significant eigenvectors/-faces as these
-        % typically mostly encode information about illumination
-        [eigen_vectors, mean_face_vec] = PCA(face_vecs, 4:(size(faces,3)-1));
+        % Remove the 3 major eigenvectors/-faces as these typically mostly 
+        % encode information about illumination. Remove the minor 
+        % eigenvectors that together contributes 12% to the total variance 
+        % to reduce space requirements. These doesn't seem to help.
+        [eigen_vectors, mean_face_vec] = PCA(face_vecs, 4:(size(faces,3)), 0.88);
         
         eigen_vectors = transpose(eigen_vectors);
         

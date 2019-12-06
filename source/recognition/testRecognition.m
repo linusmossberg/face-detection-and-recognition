@@ -1,18 +1,17 @@
 
-type = 'fisher';
+type = 'eigen';
 
 image_files = dir('../data/faces/*.jpg');
 correctly_matched = 0;
 false_positives = 0;
 false_negatives = 0;
-misidentifications = 0;
 for image_file = image_files'
     i = str2num(extractBefore(extractAfter(image_file.name, '_'), '.'));
     id = getId(i);
     [matched_id, distance] = tnm034(imread([image_file.folder '\' image_file.name]), type);
     if id == matched_id
         correctly_matched = correctly_matched + 1;
-        disp([image_file.name ', correctly matched id: ' num2str(matched_id)])
+        %disp([image_file.name ', correctly matched id: ' num2str(matched_id)])
     else
         if id ~= 0 && matched_id == 0
             false_negatives = false_negatives + 1;

@@ -6,7 +6,7 @@ function [id, distance] = recognizeFace(face, type)
         threshold = 24;
         M = fisherfaces();
     else
-        threshold = 21.82;
+        threshold = 16.9;
         M = eigenfaces();
         face_vec = face_vec - M.mean_face_vec;
     end
@@ -19,6 +19,6 @@ function [id, distance] = recognizeFace(face, type)
     if(distance < threshold)
         id = M.ids(i);
     else
-        id = 0;
+       id = 0;
     end
 end
