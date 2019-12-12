@@ -3,10 +3,10 @@ Face detection and recognition program developed in Matlab for the course *TNM03
 
 The models are trained with 72 images of 16 people that have been assigned different ID-numbers. The remaining people are unknown and the program should recognize them as such and return an ID of 0. 
 
-The number of training images is limited to 72 because otherwise there would be no images left to test the program with. This is because dimensionally reduced coordinates (weights) are stored for each training image, which means that all training images are guaranteed to be recognized correctly, regardless of how well the program actually performs.
+The number of training images is limited to 72 because otherwise there would be no images left to test the program with. This is because dimensionality-reduced coordinates (weights) are stored for each training image, which means that all training images are guaranteed to be recognized correctly, regardless of how well the program actually performs.
 
 ## Accuracy
-Of the remaining 378 images, the program is able to correctly detect and recognize 98.68% of the faces using the fisherfaces model, either with the ID corresponding to the person or 0 if the person is unknown. This could be increased to about 99.2% with more training images, but no more since the detection fails in three extremely underexposed images. The eigenfaces model only correctly recognizes 91.53% of the faces, despite using more principal components than the fisherfaces model.
+Of the remaining 378 images that the models haven't been trained with, the program is able to correctly detect and recognize 98.68% of the faces using the fisherfaces model, either with the ID corresponding to the person or 0 if the person is unknown. This could be increased to about 99.2% with more training images, but no more since the detection fails in three extremely underexposed images. The eigenfaces model only correctly recognizes 91.53% of the faces, despite using more principal components than the fisherfaces model.
 
 | Model       | Accuracy | FRR   | FAR   |
 | ----------- | -------- | ----- | ----- |
@@ -23,5 +23,3 @@ The following products are required to run the program:
 | Matlab                                  | R2019b (9.7) |
 | Image Processing Toolbox                | 11.0         |
 | Statistics and Machine Learning Toolbox | 11.6         |
-
-Earlier versions will not work.
