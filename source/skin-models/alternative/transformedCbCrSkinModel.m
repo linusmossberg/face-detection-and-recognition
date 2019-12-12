@@ -45,11 +45,6 @@ function skin = transformedCbCrSkinModel(rgb)
     x =  cos(theta) * (Cb_new - Cx) + sin(theta) * (Cr_new - Cy);
     y = -sin(theta) * (Cb_new - Cx) + cos(theta) * (Cr_new - Cy);
     
-    % Defines the expansion of the ellipse in Cb'Cr' space. Should
-    % always be 1 in the original model, but the difference in camera
-    % transfer functions between datasets changes the skin tones.
-    threshold = 1.0;
-    
-    skin = (x - ECx).^2 / (a^2) + (y - ECy).^2 / (b^2) <= threshold;
+    skin = (x - ECx).^2 / (a^2) + (y - ECy).^2 / (b^2) <= 1;
 end
 

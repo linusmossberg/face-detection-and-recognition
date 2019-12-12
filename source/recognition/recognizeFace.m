@@ -1,5 +1,4 @@
 function [id, distance] = recognizeFace(face, type)
-
     face_vec = reshape(face, [], 1);
     
     if ~strcmp(type, 'eigen')
@@ -19,6 +18,6 @@ function [id, distance] = recognizeFace(face, type)
     if(distance < threshold)
         id = M.ids(i);
     else
-       id = 0;
+        id = 0;
     end
 end

@@ -93,7 +93,7 @@ function density = getDensity(h, s, SM)
 end
 
 % Slow but more readable method to get density of one hue+sat scalar pair.
-function density = expressiveSingleGetDensity(h, s, SM)
+function density = getSingleDensity(h, s, SM)
     
     % Find position normalized to [0,1[ in limit range for each dim.
     % Position < 0 or >= 1 means that coordinate is not contained in grid.

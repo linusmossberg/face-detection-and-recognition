@@ -5,7 +5,7 @@
 % being a skin color in the HSV color space.
 
 function SkinModel = createSkinDensityModel2D(rebuild)
-    
+
     if nargin == 0
         rebuild = false;
     end
@@ -136,11 +136,11 @@ function plotModel(skin_vector_vis)
     xlim([0 360])
     ylim([0 1])
     axis square
-    shading interp
+    %shading interp
     set(H,'edgecolor','none');
     colorbar
     colormap(colormaps.RdYlBu)
-    xlabel('Hue (degrees)')
+    xlabel('180° Shifted Hue (degrees)')
     ylabel('Saturation')
 
 %     hist3(skin_vector_vis(:,1:2), [512,512],'CDataMode','auto','FaceColor','interp','LineStyle','none','FaceLighting','gouraud','AmbientStrength',0.8)

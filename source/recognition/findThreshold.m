@@ -1,7 +1,8 @@
 % Different graphs and calculations that can help with finding good
 % distance threshold values. The minimum of the 'errors' vector is probably
 % the best as this optimally reduces the sum of false positives and
-% negatives on the caltech dataset.
+% negatives on the caltech dataset. Thresholding has to be disabled in
+% recognizeFace() for this to work.
 
 type = 'fisher';
 
