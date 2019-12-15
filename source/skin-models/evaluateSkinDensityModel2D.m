@@ -19,7 +19,7 @@ function [skin, skin_unlim] = evaluateSkinDensityModel2D(rgb)
         
         % Use otsu thresholding on the skin probability image. This only 
         % compares images against themselves, which works well for 
-        % detecting underrepresented skin hues.
+        % detecting underrepresented skin tones.
         skin_unlim = skin_probability_image > graythresh(skin_probability_image);
         
         % Compute brightness (value) threshold limit of the resulting 
@@ -35,9 +35,8 @@ function [skin, skin_unlim] = evaluateSkinDensityModel2D(rgb)
         value_mask = v < value_threshold;
         skin(value_mask) = 0;
         
-        %skin_probability_image(value_mask) = 0;
-        %colormaps = load('../data/colormaps.mat');
-        %imwrite(ind2rgb(im2uint8(skin_probability_image), colormaps.RdYlBu), '../data/skin-model/skin-density-image-vis.png');
+%         skin_probability_image(value_mask) = 0;
+%         vis = ind2rgb(im2uint8(skin_probability_image), colormaps.RdYlBu);
         
     else
         h = hsv(1);

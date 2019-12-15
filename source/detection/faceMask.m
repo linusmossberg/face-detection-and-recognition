@@ -214,6 +214,7 @@ function [face_mask, quality] = faceMask(skin, image)
     debug_ = false;
 
     if debug_
+        figure
         debugPlot(candidates, pairs, winner_regions, skin, face_mask, S);
     end
 end
@@ -223,18 +224,18 @@ function debugPlot(candidates, pairs, winner_regions, skin, face_mask, S)
     runner_up_regions = setdiff(unique([candidates unique([ pairs{candidates} ])]), winner_regions);
     remaining_regions = setdiff(1:size(S,1), unique([candidates unique([ pairs{candidates} ])]));
     
-    imshow(face_mask * 0.5 + skin * 0.5); hold on;
+    imshow(face_mask * 0.75 + skin * 0.25); hold on;
     
     for region = winner_regions
-        rectangle('Position', S.BoundingBox(region, :), 'LineWidth', 2, 'EdgeColor', 'g')
+        rectangle('Position', S.BoundingBox(region, :), 'LineWidth', 3, 'EdgeColor', 'g')
     end
     
     for region = runner_up_regions
-        rectangle('Position', S.BoundingBox(region, :), 'LineWidth', 2, 'EdgeColor', 'b')
+        rectangle('Position', S.BoundingBox(region, :), 'LineWidth', 3, 'EdgeColor', 'b')
     end
     
     for region = remaining_regions
-        rectangle('Position', S.BoundingBox(region, :), 'LineWidth', 2, 'EdgeColor', 'r')
+        rectangle('Position', S.BoundingBox(region, :), 'LineWidth', 3, 'EdgeColor', 'r')
     end
 
     hold off;

@@ -18,6 +18,9 @@ function visualizeModel(model, num_principal)
         image = reshape(model.eigen_vectors(i,:), [], model.width);
         image = ind2rgb(im2uint8(rescale(image)), gray);
         imshow(image, 'Interpolation', 'bilinear');
+        
+        %t_image{i} = image;
     end
+    %imwrite(imtile(t_image, 'Frames', 1:8, 'GridSize', [2 4], 'BorderSize', 4, 'BackgroundColor', 'w'), 'eigenfaces.png');
 end
 

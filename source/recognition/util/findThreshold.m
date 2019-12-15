@@ -66,6 +66,8 @@ figure
 area(x, pdf_in_db); hold on
 area(x, pdf_not_in_db); 
 area(x, overlap)
+xlabel('Distance Threshold')
+legend('Known Acceptance', 'Unknown Acceptance', 'Overlap')
 hold off
 
 t = 0:0.001:100;
@@ -78,7 +80,9 @@ end
 num_errors = num_errors + num_errors1;
 threshold2 = t(idx);
 figure
-plot(t, errors)
+plot(t, errors + num_errors1)
+xlabel('Distance Threshold')
+ylabel('Total Number of Errors')
 
 max_dist_per_id = zeros(16);
 mean_dist_per_id = zeros(16);
