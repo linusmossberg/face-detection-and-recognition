@@ -35,7 +35,7 @@ ___
 
 <h5 align="center">Skin Model</h5>
 
-![](data\visualizations\skin-model.png)
+![](data/visualizations/skin-model.png)
 
 ___
 
