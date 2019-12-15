@@ -2,4 +2,8 @@
 *.png
 *.psd
 !data/skin-model/representative_faces_samples_fill.png
-!data/visualizations
+!data/visualizations/skin-model.png
+!data/visualizations/eval_result.png
+!data/visualizations/face_mask_vis.png
+!data/visualizations/detect_triangle.png
+!data/visualizations/eigenfaces.png
