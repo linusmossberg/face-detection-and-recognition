@@ -1,5 +1,5 @@
 
-type = 'fisher';
+type = 'eigen';
 
 image_files = dir('../data/faces/*.jpg');
 correctly_matched = 0;

@@ -32,7 +32,7 @@ function SkinModel = createSkinDensityModel2D(rebuild)
         skin_vector_hsv = reshape(rep_faces(rep_faces_mask), [], 3);
         skin_vector_hsv = centerSkinHue(skin_vector_hsv);
         
-        if(true)
+        if(false)
             plotModel(skin_vector_hsv);
         end
         
