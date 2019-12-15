@@ -29,7 +29,7 @@ The following products are required to run the program:
 
 ## Visualizations
 
-The following are a few visualizations of the detection and recognition pipeline created for the report.
+The following are a few visualizations of parts of the detection and recognition pipeline created for the report.
 
 ___
 
@@ -41,22 +41,22 @@ ___
 
 <h5 align="center">Evaluation and Otsu Thresholding</h5>
 
-![](data\visualizations\eval_result.png)
+![](data/visualizations/eval_result.png)
 
 ___
 
 <h5 align="center">Face Mask Detection</h5>
 
-![](data\visualizations\face_mask_vis.png)
+![](data/visualizations/face_mask_vis.png)
 
 ___
 
 <h5 align="center">Face Triangle Detection and Normalization</h5>
 
-![](data\visualizations\detect_triangle.png)
+![](data/visualizations/detect_triangle.png)
 
 ___
 
 <h5 align="center">Recognition Model</h5>
 
-![](data\visualizations\eigenfaces.png)
+![](data/visualizations/eigenfaces.png)
