@@ -15,6 +15,10 @@ Of the remaining 378 images that the program hasn't seen before, the program is 
 
 The training images are not included in these numbers as these are guaranteed to be recognized correctly. False rejection rate (FRR) refers occurrences where the program doesn't recognize a known face, while false acceptance rate (FAR) refers to occurrences where the program thinks that it recognizes face that in reality is either unknown or belongs to a different known person. Both of the models have distance thresholds set to optimally reduce the sum of false acceptance and rejection rates.
 
+## Report
+
+A report describing this work in more detail is available [here](report.pdf). It was written in a short time and the structure and formulations are often lacking because of it, but it may still be informative. Much of the code contains more implementation-specific commented explanations.
+
 ## Requirements
 
 The following products are required to run the program:
@@ -24,10 +28,6 @@ The following products are required to run the program:
 | Matlab                                  | R2019b (9.7) |
 | Image Processing Toolbox                | 11.0         |
 | Statistics and Machine Learning Toolbox | 11.6         |
-
-## Report
-
-A report describing this work in more detail is available [here](report.pdf). The report was written in only three days and the structure and formulations are often lacking because of it, but it may still be informative. Much of the code contains more implementation-specific commented explanations.
 
 ## Visualizations
 
