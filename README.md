@@ -15,6 +15,16 @@ Of the remaining 378 images that the program hasn't seen before, the program is 
 
 The training images are not included in these numbers as these are guaranteed to be recognized correctly. False rejection rate (FRR) refers occurrences where the program doesn't recognize a known face, while false acceptance rate (FAR) refers to occurrences where the program thinks that it recognizes face that in reality is either unknown or belongs to a different known person. Both of the models have distance thresholds set to optimally reduce the sum of false acceptance and rejection rates.
 
+## Usage
+
+To use the program, set the MATLAB working directory to the *source* directory and run:
+```
+[id, distance] = tnm034(image, type);
+```
+The `image` input argument is the image of the face that should be recognized, which can be either an RGB-image or an image-number from the database (1 to 450). The `type` input argument specifies which recognition method to use and can be either `'fisher'` or `'eigen'`.
+
+The `id` output argument is the id-number of the person recognized in the input image (defined in [getId.m](source/recognition/util/getId.m)), and `distance` is the face-space distance between the face in the input image and the matched face in the training database.
+
 ## Report
 
 A report describing this work in more detail is available [here](report.pdf). It was written in a short time and the structure and formulations are often lacking because of it, but it may still be informative. Much of the code contains more implementation-specific commented explanations.
